@@ -13,31 +13,41 @@ def load_text(document):
     # delete existing documents so we don't get an error when running this file
     # multiple times
 
-    open(document)
+    document = open(document)
     # I swear there's another way to open a file without having to close it--have
     # to look for that tonight. 
 
     name = (document)
-    text = read(document)
+    text = document.read()
 
     document = Document(name=name, 
                         text=text
                         )
 
-    db.session.add(Document)
+    db.session.add(document)
 
     db.session.commit()
 
-    close(document)
+    document.close()
 
 
-def store_search(search):
+def store_search(search, document_id):
     """ Store search information into the database """
 
 
     search = Search(search_phrase=search_phrase,
-        
+                    document_id=document_id)
 
-    db.session.add(Search)
+
+
+
+    db.session.add(search)
     db.session.commit()
 
+
+if __name__ == "__main__":
+    connect_to_db(app)
+
+    db.create_all()
+
+    load_text('text_page.html')
