@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<head>
+    <title>Upload A Text File</title>
+</head>
+
+<form action="/file_view" method="post">
+    <input type="file" name="file" accept=".txt">
+    <input type="text" name="filename" placeholder="Enter File Name">
+    <button>Submit</button>
+</form>
+
+{% endblock %}
