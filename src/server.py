@@ -8,19 +8,43 @@ from model import (Document, Search, Search_Match, connect_to_db, db)
 
 from werkzeug.utils import secure_filename
 
+from sqlalchemy import func
+
+
 ALLOWED_EXTENSIONS = {'txt'}
 
 app = Flask(__name__)
 
 app.secret_key = "ABC"
 
+
 # mocking out server.py for now
+
+
+def load_text(document, name):
+        """ Load the text from the document into database """
+
+        text = document.read()
+
+        document = Document(text=text,
+                            name=name, 
+                            )
+
+        db.session.add(document)
+
+        db.session.commit()
+
+        return document
+
 
 @app.route('/')
 def display_homepage():
     """ Displays homepage """
 
-    return render_template('homepage.html')
+    file = Document.query.get(1)
+    # testing this for now -- will remove once satisfied with results of db queries
+
+    return render_template('homepage.html', file=file)
 
 
 @app.route('/upload_file')
@@ -36,39 +60,12 @@ def display_document():
 
     file = request.files['file']
 
-    print('file with initial request --------------------------', file)
-
     filename = request.form.get('filename')
     filename = secure_filename(filename)
 
-    text = file.read()
+    file = load_text(file, filename)
 
-    document = Document(document_id=document_id, name=filename, text=text)
-
-    print('document!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', document)
-
-    db.session.add(document)
-
-    db.session.commit()
-    
-
-    print(filename)
-    print('FILE-------------------------',file)
-
-
-    # filename.load_text(file, filename)
-
-    # newfile = Document()
-
-    # db.session.add(newfile)
-
-    # newfile.text = file
-    # newfile.name = filename
-
-    # db.session.commit()
-
-
-    return render_template("file_view.html", document=document)
+    return render_template("file_view.html", file=file)
 
 
 if __name__ == "__main__":
