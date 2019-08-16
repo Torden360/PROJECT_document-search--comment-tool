@@ -12,17 +12,16 @@ from sqlalchemy import func
 
 
 ALLOWED_EXTENSIONS = {'txt'}
+# not sure that I will use this/if I need it when I am forcing the accept params
+# on the html itself. Which is better to do that with?/More secure
 
 app = Flask(__name__)
 
 app.secret_key = "ABC"
 
 
-# mocking out server.py for now
-
-
 def load_text(document, name):
-        """ Load the text from the document into database """
+        """ Load the text from the document into database, and create new db object """
 
         text = document.read()
 
@@ -59,11 +58,16 @@ def display_document():
     """ Displays the document of user's choice """
 
     file = request.files['file']
+    # retrieves the uploaded file
 
     filename = request.form.get('filename')
+    # gets the filename that was entered by the user
+
     filename = secure_filename(filename)
+    # DOCUMENTATION says this ensures the filename is safe???
 
     file = load_text(file, filename)
+    # call load_text FN with the file and filename
 
     return render_template("file_view.html", file=file)
 

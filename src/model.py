@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+# don't think I need to import func here
 
 db = SQLAlchemy()
 
@@ -90,11 +91,12 @@ def connect_to_db(app):
     """Connect db to the Flask app"""
 
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///searchy'
-
-    # I'm not convinced we need these ---------------------------
-    app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # -----------------------------------------------------------
+    # should turn this off, otherwise buggy
+
+    app.config['SQLALCHEMY_ECHO'] = True
+    # don't need to have this on, unless want to see the SQL query that 
+    # sqlalchemy is executing
 
     db.app = app
 
@@ -104,8 +106,10 @@ def connect_to_db(app):
 if __name__ == "__main__":
 
     from server import app
+
     connect_to_db(app)
     # run the module interactively to work with db directly
+    
     print('Connected to DB')
 
     db.create_all()

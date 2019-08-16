@@ -7,9 +7,11 @@
 </head>
 
 <form action="/file_view" enctype="multipart/form-data" method="post">
+    <!-- I believe the enctype allows for a file to be uploaded, again not positive I need it -->
     <input type="file" name="file" accept=".txt">
     <input type="text" name="filename" placeholder="Enter File Name">
     <input type="submit" value="upload">
+    <!-- Not positive that I need this value="upload" here. -->
 </form>
 
 {% endblock %}
