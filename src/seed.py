@@ -21,6 +21,7 @@ def load_text(document, name):
 
     # name = (document)
     # Having user input name
+    
     text = document.read()
 
     document = Document(name=name, 
