@@ -41,16 +41,22 @@ def display_document():
     filename = request.form.get('filename')
     filename = secure_filename(filename)
 
-    filename = Document()
+    text = file.read()
 
-    db.session.add(filename)
+    document = Document(document_id=document_id, name=filename, text=text)
+
+    print('document!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', document)
+
+    db.session.add(document)
+
+    db.session.commit()
     
 
     print(filename)
     print('FILE-------------------------',file)
 
 
-    filename.load_text(file, filename)
+    # filename.load_text(file, filename)
 
     # newfile = Document()
 
@@ -62,7 +68,7 @@ def display_document():
     # db.session.commit()
 
 
-    return render_template("file_view.html", filename=filename, file=file)
+    return render_template("file_view.html", document=document)
 
 
 if __name__ == "__main__":

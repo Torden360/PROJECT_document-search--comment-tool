@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 db = SQLAlchemy()
 
@@ -122,7 +123,7 @@ class Search_Match(db.Model):
 def connect_to_db(app):
     """Connect db to the Flask app"""
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgress:///searchy'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///searchy'
 
     # I'm not convinced we need these ---------------------------
     app.config['SQLALCHEMY_ECHO'] = True
@@ -140,3 +141,5 @@ if __name__ == "__main__":
     connect_to_db(app)
     # run the module interactively to work with db directly
     print('Connected to DB')
+
+    db.create_all()
