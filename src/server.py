@@ -6,6 +6,10 @@ from flask_debugtoolbar import DebugToolbarExtension
 from model import (Document, Search, Search_Match, connect_to_db, db) 
 # will add Group, Group_Match, and Comment after MVP
 
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = {'txt'}
+
 app = Flask(__name__)
 
 app.secret_key = "ABC"
@@ -30,11 +34,32 @@ def upload_document():
 def display_document():
     """ Displays the document of user's choice """
 
-    file = request.form.get('file')
+    file = request.files['file']
+
+    print('file with initial request --------------------------', file)
+
     filename = request.form.get('filename')
+    filename = secure_filename(filename)
+
+    filename = Document()
+
+    db.session.add(filename)
+    
 
     print(filename)
-    print(file)
+    print('FILE-------------------------',file)
+
+
+    filename.load_text(file, filename)
+
+    # newfile = Document()
+
+    # db.session.add(newfile)
+
+    # newfile.text = file
+    # newfile.name = filename
+
+    # db.session.commit()
 
 
     return render_template("file_view.html", filename=filename, file=file)

@@ -18,6 +18,41 @@ class Document(db.Model):
         return f'<document_id = {self.document_id} name = {self.name}>'
 
 
+    def load_text(self, document, name):
+        """ Load the text from the document into database """
+
+    # Document.query.delete()
+    # delete existing documents so we don't get an error when running this file
+    # multiple times
+    # on second thought, I don't think I'll run this file as itself, but import 
+    # FNs to other files from it
+
+        document.name = name 
+
+        print(document.name)
+
+        # document = open(document)
+        # I swear there's another way to open a file without having to close it--have
+        # to look for that tonight. 
+
+        # name = (document)
+        # Having user input name
+        
+        text = document.read()
+
+        # document = Document(name=name, 
+        #                     text=text
+        #                     )
+
+        document.text = text
+
+        db.session.add(document)
+
+        db.session.commit()
+
+        # document.close()
+
+
 class Search(db.Model):
     """ Search on document """
 
@@ -26,6 +61,8 @@ class Search(db.Model):
     search_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     search_phrase = db.Column(db.String(150), nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.document_id'))
+
+    document = db.relationship('Document', backref='searches')
 
     def __repr__(self):
 
@@ -41,6 +78,8 @@ class Search_Match(db.Model):
     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
     start_offset = db.Column(db.Integer, nullable=False)
     end_offset = db.Column(db.Integer, nullable=False)
+
+    search = db.relationship('Search', backref="search_matches")
 
 
 # ----------- Add After MVP ------------
@@ -86,7 +125,7 @@ def connect_to_db(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgress:///searchy'
 
     # I'm not convinced we need these ---------------------------
-    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # -----------------------------------------------------------
 
@@ -97,7 +136,7 @@ def connect_to_db(app):
 
 if __name__ == "__main__":
 
-    from server.py import app
+    from server import app
     connect_to_db(app)
     # run the module interactively to work with db directly
     print('Connected to DB')
