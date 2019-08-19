@@ -16,15 +16,15 @@ def load_text(document, name):
         return document
 
 
-# def store_search(search, document_id):
-#     """ Store search information into the database """
+def store_search(search_phrase, document_id):
+    """ Store search information into the database """
 
 
-#     search = Search(search_phrase=search_phrase,
-#                     document_id=document_id)
+    search = Search(search_phrase=search_phrase,
+                    document_id=document_id)
 
 
 
 
-#     db.session.add(search)
-#     db.session.commit()
+    db.session.add(search)
+    db.session.commit()

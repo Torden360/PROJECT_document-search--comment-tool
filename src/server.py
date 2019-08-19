@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 from sqlalchemy import func
 
-from db_functions import load_text
+from db_functions import load_text, store_search
 
 
 ALLOWED_EXTENSIONS = {'txt'}
@@ -51,16 +51,37 @@ def display_document():
     filename = request.form.get('filename')
     # gets the filename that was entered by the user
 
-    filename = secure_filename(filename)
-    # DOCUMENTATION says this ensures the filename is safe???
-    # may not be necessary because this is mostly if you're saving a file to the file system
-
     file = load_text(file, filename)
     # call load_text FN with the file and filename
 
     text = bytes.decode(file.text)
+    # decodes byte string
+
+    # should I be storing this file object in a session so that I can get the id again?
 
     return render_template("file_view.html", file=file, text=text)
+
+
+
+@app.route('/search_view')
+def search_document():
+    """ Gets and stores user's input search on the given document """
+
+    search_phrase = request.args.get('search_phrase')
+    # gets the filename that was entered by the user
+
+    document_id = request.args.get('doc_id')
+
+    store_search(search_phrase, document_id)
+
+    # matches = search_document(term, document)
+
+    matches = ['match1']
+
+    return render_template("file_view.html", file=file, text=text, 
+        search_phrase=search_phrase, matches=matches)
+
+
 
 
 if __name__ == "__main__":

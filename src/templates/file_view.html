@@ -3,5 +3,14 @@
 {% block title %}Viewing: {{file.name}}{% endblock %}
 
 {% block bodycontent %}
+<form action="/search_view">
+    <input type="text" name="search_phrase" placeholder="Search">
+    <input type="text" name="doc_id" value="{{file.document_id}}" hidden>
+    <input type="submit">
+</form>
+{% for match in matches %}
+<p> {{match}} </p>
+{% endfor %}
+
 {{text}}
 {% endblock %}
