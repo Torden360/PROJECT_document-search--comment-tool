@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 
 from sqlalchemy import func
 
+from db_functions import load_text
+
 
 ALLOWED_EXTENSIONS = {'txt'}
 # not sure that I will use this/if I need it when I am forcing the accept params
@@ -20,30 +22,16 @@ app = Flask(__name__)
 app.secret_key = "ABC"
 
 
-def load_text(document, name):
-        """ Load the text from the document into database, and create new db object """
-
-        text = document.read()
-
-        document = Document(text=text,
-                            name=name, 
-                            )
-
-        db.session.add(document)
-
-        db.session.commit()
-
-        return document
-
-
 @app.route('/')
 def display_homepage():
     """ Displays homepage """
 
-    file = Document.query.get(1)
+    file = Document.query.get(2)
     # testing this for now -- will remove once satisfied with results of db queries
 
-    return render_template('homepage.html', file=file)
+    text = bytes.decode(file.text)
+
+    return render_template('homepage.html', file=file, text=text)
 
 
 @app.route('/upload_file')
@@ -65,11 +53,14 @@ def display_document():
 
     filename = secure_filename(filename)
     # DOCUMENTATION says this ensures the filename is safe???
+    # may not be necessary because this is mostly if you're saving a file to the file system
 
     file = load_text(file, filename)
     # call load_text FN with the file and filename
 
-    return render_template("file_view.html", file=file)
+    text = bytes.decode(file.text)
+
+    return render_template("file_view.html", file=file, text=text)
 
 
 if __name__ == "__main__":
