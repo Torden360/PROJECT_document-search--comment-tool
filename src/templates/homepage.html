@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<head>
-    <title> Homepage </title>
-</head>
-<body>
+{% block title %} Homepage {% endblock %}
+
+{% block bodycontent %}
     <h1> Homepage </h1>
     <p> Checking to see if I can query and have the correct output </p>
-    <p> {{file.name}}
-        {{file.text}}
+    <h3> {{file.name}} </h3>
+    <p id="file">
+{{text}}
     </p>
-
+    <p>
+        {{file}}
+    </p>
 {% endblock %}

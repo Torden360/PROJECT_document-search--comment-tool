@@ -1,13 +1,7 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<head>
-    <title>Viewing: {{file.name}}</title>
-</head>
+{% block title %}Viewing: {{file.name}}{% endblock %}
 
-<body>
-    {{file.text}}
-
-</body>
-
+{% block bodycontent %}
+{{text}}
 {% endblock %}
