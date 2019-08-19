@@ -63,6 +63,8 @@ def display_document():
 
 
 
+# mocking this out for now
+
 @app.route('/search_view')
 def search_document():
     """ Gets and stores user's input search on the given document """
