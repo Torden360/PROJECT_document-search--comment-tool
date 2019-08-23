@@ -1,4 +1,51 @@
 #file {
     white-space: pre-wrap;
+    margin: 10px;
+    width: 100%;
 }
 
+#search {
+    margin: 20px;
+    width: 100%vw;
+    border-style: solid;
+}
+
+#search_bar {
+    text-align: center;
+    width: 100%;
+}
+
+#match_result {
+    background-color: purple;
+    text-align: center;
+}
+
+#save {
+    margin-top: 10px;
+}
+
+.container {
+    display: flex;
+    border-style: solid;
+}
+
+.match_container {
+    display: flex;
+    padding: 20px;
+    border-left: solid;
+    flex-direction: column;
+    width: 30%;
+}
+
+.matches {
+    display: flex;
+    flex-direction: column;
+    border-style: solid;
+    border-bottom: none;
+    justify-content: flex-start;
+    height: 100%;
+}
+
+.matches:last-of-type {
+    border-bottom: solid;
+}
