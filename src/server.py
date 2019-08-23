@@ -12,6 +12,8 @@ from sqlalchemy import func
 
 from db_functions import load_text, store_search
 
+from search import search
+
 
 ALLOWED_EXTENSIONS = {'txt'}
 # not sure that I will use this/if I need it when I am forcing the accept params
@@ -63,7 +65,7 @@ def display_document():
 
 
 
-# mocking this out for now
+# developping this in the most basic/redundant way for now
 
 @app.route('/search_view')
 def search_document():
@@ -76,9 +78,10 @@ def search_document():
 
     store_search(search_phrase, document_id)
 
-    # matches = search_document(term, document)
+    file = Document.query.get(document_id)
+    text = bytes.decode(file.text)
 
-    matches = ['match1']
+    matches = search(search_phrase, text)
 
     return render_template("file_view.html", file=file, text=text, 
         search_phrase=search_phrase, matches=matches)
