@@ -131,9 +131,12 @@ def get_context(location):
     pass
 
 
-def search(phrase, document):
+def search(phrase, document_text):
 
-    pass
+    matches = re.findall(r'\b{}\b'.format(phrase), document_text)
+
+    return matches
+
     # open_doc(document)
 
     # location = get_location(phrase)
