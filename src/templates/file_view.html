@@ -17,14 +17,17 @@
     </p>
 
     <div class="match_container" id="group_id">
-
-        {% for match in matches %}
-        <div class="matches" id="match_id">
-            <label id="match_result"> {{match}} </label>
+        {% if matches %}
+            {% for match in matches %}
+            <div class="matches" id="match_id">
+                <label id="match_result"> {{match}} </label>
 <textarea row="10" col="50" id="note_id">Note: </textarea>
-        </div>
-        {% endfor %}
-       
+            </div>
+            {% endfor %}
+            <form id="save" action="/save_grouped_matches">
+                <input type="submit" value="Save">
+            </form>
+        {% endif %}
         
         {% if not matches %}
         No match results found.
