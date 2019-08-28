@@ -59,8 +59,6 @@ def display_document():
     text = bytes.decode(file.text)
     # decodes byte string
 
-    # should I be storing this file object in a session so that I can get the id again?
-
     return render_template("file_view.html", file=file, text=text)
 
 
@@ -84,6 +82,30 @@ def search_document():
     matches = search(search_phrase, text)
 
     return render_template("file_view.html", file=file, text=text, 
+        search_phrase=search_phrase, matches=matches)
+
+
+# This route is incomplete
+@app.route('/save_grouped_matches')
+def save_matches():
+    """ Saves the matches and notes in a group """
+
+    search_phrase = request.args.get('search_phrase')
+    # gets the filename that was entered by the user
+
+    document_id = request.args.get('doc_id')
+
+    file = Document.query.get(document_id)
+    text = bytes.decode(file.text)
+
+    matches = search(search_phrase, text)
+    print(matches)
+
+    # if request.args.get('save'):
+    #     store_match(search_id, start_offset, end_offset)
+    #     flash("Your Grouped Matches and Notes have been saved!")
+
+    return render_template("file_view.html", file=file, text=text,
         search_phrase=search_phrase, matches=matches)
 
 
