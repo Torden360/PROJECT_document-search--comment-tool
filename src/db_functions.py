@@ -23,8 +23,16 @@ def store_search(search_phrase, document_id):
     search = Search(search_phrase=search_phrase,
                     document_id=document_id)
 
-
-
-
     db.session.add(search)
     db.session.commit()
+
+
+def store_match(search_id, start_offset, end_offset):
+
+    match = Search_Match(search_id=search_id,
+                  start_offset=start_offset,
+                  end_offset=end_offset)
+
+    db.session.add(match)
+    db.session.commit()
+
