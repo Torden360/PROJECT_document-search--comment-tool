@@ -16,7 +16,7 @@
 }
 
 #match_result {
-    background-color: purple;
+    background-color: #cabdda;
     text-align: center;
 }
 
@@ -43,7 +43,6 @@
     border-style: solid;
     border-bottom: none;
     justify-content: flex-start;
-    height: 100%;
 }
 
 .matches:last-of-type {
