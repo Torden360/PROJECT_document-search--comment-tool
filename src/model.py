@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
-# don't think I need to import func here
+# TODO: don't think I need to import func here
 
 db = SQLAlchemy()
 
@@ -29,6 +29,7 @@ class Search(db.Model):
     search_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     search_phrase = db.Column(db.String(150), nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.document_id'))
+    # TODO: will probably add count later to store num times phrase was searched
 
     document = db.relationship('Document', backref='searches')
 
@@ -46,6 +47,7 @@ class Search_Match(db.Model):
     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
     start_offset = db.Column(db.Integer, nullable=False)
     end_offset = db.Column(db.Integer, nullable=False)
+# TODO: think I will need to add group member_id, group_id
 
     search = db.relationship('Search', backref="search_matches")
 
@@ -60,7 +62,7 @@ class Search_Match(db.Model):
 #     group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
 #     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
 
-
+# TODO: think I will get rid of this table--DO NOT DELETE UNTIL COMPLETE DB
 # class Group_Match(db.Model):
 
 #     __tablename__ = "group_members"
@@ -73,6 +75,14 @@ class Search_Match(db.Model):
 # class Comment(db.Model):
 
 #     __tablename__ = "comments"
+
+    # note_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    # note_content = db.Column(db.Text)
+    # group_id = db.Column(db.Integer, nullable=False, db.ForeignKey('groups.group_id'))
+    # TODO: I see, I do need a match ID here. 
+
+    # search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
+    # TODO: search_id may not be necessary here
 
 
 # ----------- Helper Functions ------------
