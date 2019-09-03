@@ -48,6 +48,8 @@ class Search_Match(db.Model):
     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
     start_offset = db.Column(db.Integer, nullable=False)
     end_offset = db.Column(db.Integer, nullable=False)
+    match_content = db.Column(db.Text)
+
 # TODO: think I will need to add group member_id, group_id
 
     search = db.relationship('Search', backref="search_matches")
@@ -75,17 +77,17 @@ class Group(db.Model):
 #     search_match_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
 
 
-# class Comment(db.Model):
+class Note(db.Model):
 
-#     __tablename__ = "comments"
+    __tablename__ = "notes"
 
-    # note_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    # note_content = db.Column(db.Text)
-    # group_id = db.Column(db.Integer, nullable=False, db.ForeignKey('groups.group_id'))
-    # TODO: I see, I do need a match ID here. 
+    note_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    note_content = db.Column(db.Text)
+    match_id = db.Column(db.Integer, db.ForeignKey('search_matches.match_id'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('groups.group_id'), nullable=False)
 
-    # search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
-    # TODO: search_id may not be necessary here
+    match = db.relationship('Search_Match', backref="notes")
+    group = db.relationship('Group', backref="notes")
 
 
 # ----------- Helper Functions ------------
