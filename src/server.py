@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 from sqlalchemy import func
 
-from db_functions import load_text, store_search
+from db_functions import load_text, store_search, create_group, store_match, store_notes
 
 from search import search
 
@@ -74,7 +74,7 @@ def search_document():
 
     document_id = request.args.get('doc_id')
 
-    store_search(search_phrase, document_id)
+    search_id = store_search(search_phrase, document_id)
 
     file = Document.query.get(document_id)
     text = bytes.decode(file.text)
@@ -82,41 +82,40 @@ def search_document():
     matches = search(search_phrase, text)
 
     return render_template("file_view.html", file=file, text=text, 
-        search_phrase=search_phrase, matches=matches)
+        search_phrase=search_phrase, search_id=search_id, matches=matches)
 
 
 # This route is incomplete
 @app.route('/save_grouped_matches', methods=['POST'])
 def save_matches():
     """ Saves the matches and notes in a group """
-    # probably should make this a post method
 
     req = request.get_json()
 
     print('This is json from front end!!', req)
+
+    search_id = req['search_id']
+    group_id = create_group(search_id)
+
+    for match in req['matches']:
+
+        start_offset = match['start_offset']
+        end_offset = match['end_offset']
+        match_content = match['match_content']
+
+        match_id = store_match(search_id, start_offset, end_offset, match_content)
+
+        if match['notes']:
+            note_content = match['notes']
+            store_notes(note_content, match_id, group_id)
+
+    # this flash message is currently not working, just mocked out for now
+    flash('Your search matches and notes have been saved')
     
+
     res = make_response(jsonify(req), 200)
 
     return res
-
-#     search_phrase = request.args.get('search_phrase')
-#     # gets the search phrase that was entered by the user
-
-#     document_id = request.args.get('doc_id')
-
-#     file = Document.query.get(document_id)
-#     text = bytes.decode(file.text)
-
-#     matches = search(search_phrase, text)
-#     print(matches)
-
-    # if request.args.get('save'):
-    #     store_match(search_id, start_offset, end_offset)
-    #     flash("Your Grouped Matches and Notes have been saved!")
-
-    #return render_template("file_view.html", file=file, text=text,
-        # search_phrase=search_phrase, matches=matches)
-
 
 
 
