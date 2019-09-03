@@ -24,7 +24,7 @@
                 <textarea class="notes" row="10" col="50">Note: </textarea>
             </div>
             {% endfor %}
-            <button id="save_matches_button" data-search-id="20" value="Save">
+            <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">
         {% endif %}
         
         {% if not matches %}
@@ -59,25 +59,33 @@
             console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
                         matches[i].getAttribute("data-start"));
 
-            // get content of match notes
- 
+            let notes = null;
+
+            // get match note value and determine if user has written notes
+            if (matches[i].childNodes[3].value > matches[i].childNodes[3].defaultValue) {
+                console.log('within the if statement!');
+                notes = matches[i].childNodes[3].value;
+                console.log(notes);
+            }
+
+            console.log('this ish notess ', notes);
+
             matchData['matches'].push({
-                'content': matches[i].innerText,
+                // get content of match notes
+                'match_content': matches[i].innerText,
 
                 // get start_offset
                 'start_offset': matches[i].getAttribute('data-start'),
             
                 // get end_offset of matches
                 'end_offset': matches[i].getAttribute('data-end'),
-            });
 
-            // get match note value and determine if user has written notes
-            // if matches[i].childNodes[3].value > matches[i].childNodes[3].defaultValue {
-            //     matchData['Notes'] = matches[i].childNodes[3].value;
-            // }
+                // set notes value
+                'notes': notes,
+            });
         }
 
-        console.log(matchData);
+        console.log('matchData ahhh: ', matchData);
 
         // post method to /save_grouped_matches with Fetch
         fetch('/save_grouped_matches', {
