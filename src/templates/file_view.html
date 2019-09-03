@@ -14,44 +14,48 @@
 <script>
     // Alert group notes were saved
 
-    // grab save button
+    // select save button
     const groupSaveBtn = document.querySelector('#save_matches_button');
     
     function saveMatchData() {
 
         console.log('This is saveMatchData!')
 
-        // collect matches that have not been x'd out 
+        const matchData = {};
 
-        // group_id
-        // search_id
-    // post method to /save_grouped_matches with Fetch
-
-        var matchData = {};
-
-        // collect start_offset, end_offset of matches
-        const matches = document.querySelectorAll('.matches');
+        // select matches that have not been x'd out 
         // can now index into this array of objects
-        // const foo = document.getElementById('foo');
+        const matches = document.querySelectorAll('.matches');
+
+        // get search_id and put into dictionary
+        matchData['search_id'] = document.getAttribute('data-search-id');
+
+        matchData['matches'] = [];
+
         for (let i = 0; i < matches.length; i++) {
-        console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", matches[i].getAttribute("data-start"));
+
+            console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
+                        matches[i].getAttribute("data-start"));
+
+            // get content of match notes
+ 
+            matchData['matches'].push({
+                'content': matches[i].innerText,
+
+                // get start_offset
+                'start_offset': matches[i].getAttribute('data-start'),
+            
+                // get end_offset of matches
+                'end_offset': matches[i].getAttribute('data-end'),
+            });
+
             // get match note value and determine if user has written notes
-            if matches[i].childNodes[3].value > matches[i].childNodes[3].defaultValue {
-                "Notes" = matches[i].childNodes[3].value;
-            }
+            // if matches[i].childNodes[3].value > matches[i].childNodes[3].defaultValue {
+            //     matchData['Notes'] = matches[i].childNodes[3].value;
+            // }
         }
 
-        // collect content of match notes
-
-        for let match in matchOffsets {
-            // collect match ouptut / the string
-            const matchContent = document.querySelector('[name="match_result"]');
-        for let note in matchNote {
-            // collect match_id
-            document.querySelector('[data-id]');
-            }  
-        }
-
+        // post method to /save_grouped_matches with Fetch
         fetch('/save_grouped_matches', {
             method: 'POST',
             body: JSON.stringify(matchData)
@@ -64,19 +68,18 @@
     // add onclick listener
     groupSaveBtn.addEventListener('click', saveMatchData);
 
-
 </script>
 <div class="container">
     <p id="file">
 {{text}}
     </p>
 
-    <div class="match_container" data-id="{{search_id}}">
+    <div class="match_container" data-search-id="{{search_id}}">
         {% if matches %}
             {% for match in matches %}
             <div class="matches" data-start="{{match_start}}match_start" data-end="{{match_end}}">
-                <label name="match_result"> {{match}} </label>
-                <textarea class="notes" row="10" col="50" data-id="{{match_id}}">Note: </textarea>
+                <label> {{match}} </label>
+                <textarea class="notes" row="10" col="50">Note: </textarea>
             </div>
             {% endfor %}
             <button id="save_matches_button" value="Save">
@@ -85,7 +88,6 @@
         {% if not matches %}
         No match results found.
         {% endif %}
-
     </div>
 
 </div>
