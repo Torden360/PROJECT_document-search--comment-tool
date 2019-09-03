@@ -1,6 +1,6 @@
 from jinja2 import StrictUndefined
 
-from flask import (Flask, render_template, redirect, request, flash, session)
+from flask import (Flask, render_template, redirect, request, jsonify, make_response, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
 from model import (Document, Search, Search_Match, connect_to_db, db) 
@@ -70,7 +70,7 @@ def search_document():
     """ Gets and stores user's input search on the given document """
 
     search_phrase = request.args.get('search_phrase')
-    # gets the filename that was entered by the user
+    # gets the search phrase that was entered by the user
 
     document_id = request.args.get('doc_id')
 
@@ -86,27 +86,36 @@ def search_document():
 
 
 # This route is incomplete
-@app.route('/save_grouped_matches')
+@app.route('/save_grouped_matches', methods=['POST'])
 def save_matches():
     """ Saves the matches and notes in a group """
+    # probably should make this a post method
 
-    search_phrase = request.args.get('search_phrase')
-    # gets the filename that was entered by the user
+    req = request.get_json()
 
-    document_id = request.args.get('doc_id')
+    print('This is json from front end!!', req)
+    
+    res = make_response(jsonify(req), 200)
 
-    file = Document.query.get(document_id)
-    text = bytes.decode(file.text)
+    return res
 
-    matches = search(search_phrase, text)
-    print(matches)
+#     search_phrase = request.args.get('search_phrase')
+#     # gets the search phrase that was entered by the user
+
+#     document_id = request.args.get('doc_id')
+
+#     file = Document.query.get(document_id)
+#     text = bytes.decode(file.text)
+
+#     matches = search(search_phrase, text)
+#     print(matches)
 
     # if request.args.get('save'):
     #     store_match(search_id, start_offset, end_offset)
     #     flash("Your Grouped Matches and Notes have been saved!")
 
-    return render_template("file_view.html", file=file, text=text,
-        search_phrase=search_phrase, matches=matches)
+    #return render_template("file_view.html", file=file, text=text,
+        # search_phrase=search_phrase, matches=matches)
 
 
 
