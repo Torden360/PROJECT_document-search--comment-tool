@@ -32,6 +32,7 @@ class Search(db.Model):
     # TODO: will probably add count later to store num times phrase was searched
 
     document = db.relationship('Document', backref='searches')
+    group = db.relationship('Group', backref="searches")
 
     def __repr__(self):
 
@@ -54,13 +55,15 @@ class Search_Match(db.Model):
 
 # ----------- Add After MVP ------------
 
+class Group(db.Model):
 
-# class Group(db.Model):
+    __tablename__ = "groups"
 
-#     __tablename__ = "groups"
+    group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
 
-#     group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
+    search = db.relationship('Search', backref="groups")
+
 
 # TODO: think I will get rid of this table--DO NOT DELETE UNTIL COMPLETE DB
 # class Group_Match(db.Model):
