@@ -38,12 +38,12 @@
 const closeMatch  = document.querySelectorAll('.close_match');
 
 // // closes match on click x
-// for (let i = 0; i < closeMatch.length; i++) {
-//     closeMatch[i].addEventListener('click', function() {
-//         this.parentElement.style.display = 'none';
-//         this.parentElement.removeAttribute('[class="matches"]');
-//     });
-// }
+for (let i = 0; i < closeMatch.length; i++) {
+    closeMatch[i].addEventListener('click', function() {
+        this.parentElement.style.display = 'none';
+        this.parentElement.removeAttribute('class');
+    });
+}
 
 // would have to be on the containing div, but if still saving even when view closes, can try:
 // Element.removeAttribute('class')
@@ -70,16 +70,15 @@ const closeMatch  = document.querySelectorAll('.close_match');
         matchData['matches'] = [];
 
         for (let i = 0; i < matches.length; i++) {
-
             console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
                         matches[i].getAttribute("data-start"));
 
             let notes = null;
 
             // get match note value and determine if user has written notes
-            if (matches[i].childNodes[3].value > matches[i].childNodes[3].defaultValue) {
+            if (matches[i].children[2].value > matches[i].children[2].defaultValue) {
                 console.log('within the if statement!');
-                notes = matches[i].childNodes[3].value;
+                notes = matches[i].children[2].value;
                 console.log(notes);
             }
 
