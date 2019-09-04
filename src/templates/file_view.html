@@ -19,12 +19,12 @@
     <div class="match_container">
         {% if matches %}
             {% for match in matches %}
-            <div class="matches" data-start="1" data-end="3">
+            <div class="matches" data-start="1" data-end="3"> <span class="close_match">x</span> 
                 <label> {{match}} </label>
                 <textarea class="notes" row="10" col="50">Note: </textarea>
             </div>
             {% endfor %}
-            <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">
+            <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
         {% endif %}
         
         {% if not matches %}
@@ -34,6 +34,16 @@
 
 </div>
 <script>
+
+const closeMatch  = document.querySelectorAll('.close_match');
+
+# currently closes the match, but not the corresponding note
+for (let i = 0; i < closeMatch.length; i++) {
+    closeMatch[i].addEventListener('click', function() {
+        this.parentElement.style.display = 'none';
+    });
+}
+
     // Alert group notes were saved
 
     // select save button
