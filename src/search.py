@@ -44,7 +44,9 @@ def get_context(phrase, document_text):
 
 def search(phrase, document_text):
 
-    matches = re.findall(r'\b{}\b'.format(phrase), document_text)
+#     matches = re.findall(r'\b{}\b'.format(phrase), document_text)
+
+    matches = re.findall(r'[^.?!]*[.?!(?:\s)]*[^.?!]*\b{}\b[^.?!]*[.?!(?:\s)]*[^.?!]*[.?!(?:\s)]'.format(phrase), document_text, re.IGNORECASE)
 
     return matches
 
