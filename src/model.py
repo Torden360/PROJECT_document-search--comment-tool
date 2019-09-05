@@ -66,6 +66,8 @@ class Group(db.Model):
 
     search = db.relationship('Search', backref="groups")
 
+#TODO: I forgot to add group_id to search_matches + relationship, and I'm payin' for it.
+
 
 # TODO: think I will get rid of this table--DO NOT DELETE UNTIL COMPLETE DB
 # class Group_Match(db.Model):
@@ -109,7 +111,7 @@ def connect_to_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # should turn this off, otherwise buggy
 
-    app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = False
     # don't need to have this on, unless want to see the SQL query that 
     # sqlalchemy is executing
 
