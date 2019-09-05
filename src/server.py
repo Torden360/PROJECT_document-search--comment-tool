@@ -28,12 +28,19 @@ app.secret_key = "ABC"
 def display_homepage():
     """ Displays homepage """
 
-    file = Document.query.get(2)
+    file = Document.query.get(1)
     # testing this for now -- will remove once satisfied with results of db queries
 
-    text = bytes.decode(file.text)
+    searches = file.searches
 
-    return render_template('homepage.html', file=file, text=text)
+    for search_phrase in searches:
+        if search.match_id:
+            matches = search.match_id
+
+    return render_template('homepage.html', file=file, searches=searches, matches=matches)
+    # Took these out of route for now
+    # text = bytes.decode(file.text)
+    # return render_template('homepage.html', file=file, text=text)
 
 
 @app.route('/upload_file')
