@@ -28,19 +28,47 @@ app.secret_key = "ABC"
 def display_homepage():
     """ Displays homepage """
 
-    file = Document.query.get(1)
+    file = Document.query.get(3)
+    # testing this for now -- will remove once satisfied with results of db queries
+
+    searches = file.searches
+        # matches = user_search.query.filter(user_search.search_id == search_id)
+
+    return render_template('homepage.html', file=file)
+    # Took these out of route for now
+    # text = bytes.decode(file.text)
+    # return render_template('homepage.html', file=file, text=text)
+
+
+@app.route('/user_groups')
+def display_groups():
+    """ Displays user's groups """
+
+    file = Document.query.get(3)
     # testing this for now -- will remove once satisfied with results of db queries
 
     searches = file.searches
 
-    for search_phrase in searches:
-        if search.match_id:
-            matches = search.match_id
+    groups = []
 
-    return render_template('homepage.html', file=file, searches=searches, matches=matches)
-    # Took these out of route for now
-    # text = bytes.decode(file.text)
-    # return render_template('homepage.html', file=file, text=text)
+    for user_search in searches:
+        group = user_search.groups
+        if group:
+            search_phrase = user_search.search_phrase
+            matches = user_search.search_matches
+            group_dict = {}
+            groups.append((search_phrase, group_dict))
+            for match in matches:
+                match_content = match.match_content
+                group_dict['match_content'] = match_content
+                notes = match.notes
+                if notes:
+                    note = notes[0].note_content
+                    group_dict['note'] = note
+
+    groups = jsonify(groups)
+
+    return groups
 
 
 @app.route('/upload_file')
