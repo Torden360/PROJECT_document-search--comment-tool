@@ -7,16 +7,36 @@
     <p> Checking to see if I can query and have the correct output </p>
     <h3> {{file.name}} </h3>
 
-    <p> Actually, these should be searches for now <br>
-        {% for search in searches %}
-        {{search.search_phrase}}
-        <br>
-        {% endfor %}
+    <script>
+    function createDiv(tuple) {
+        let newDiv = document.createElement('div');
+        let searchPhrase = tuple[0];
+        let dict = tuple[1];
 
-        {% for match in matches %}
-        {{match}}
-        <br>
-        {% endfor %}
+        newDiv.innerText = searchPhrase;
+
+        return newDiv;
+    }
+    function getGroupDict() {
+      let groupDiv = document.querySelector('.groups');
+
+      fetch('/user_groups')
+      .then(response => response.json())
+      .then(data => {
+      // Here's a list of repos!
+        data.forEach(tuple => {
+            let newDiv = createDiv(tuple);
+            groupDiv.appendChild(newDiv);
+        });
+      });
+    }
+    
+    window.onload = getGroupDict
+
+    </script>
+    <p> Actually, these should be searches for now <br>
+    <div class="groups"></div>
+   
     </p>
 
     <p>
