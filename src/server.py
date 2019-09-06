@@ -8,7 +8,7 @@ from model import (Document, Search, Search_Match, connect_to_db, db)
 
 from werkzeug.utils import secure_filename
 
-from sqlalchemy import func
+from sqlalchemy import func, distinct
 
 from db_functions import load_text, store_search, create_group, store_match, store_notes
 
@@ -25,19 +25,12 @@ app.secret_key = "ABC"
 
 
 @app.route('/')
-def display_homepage():
+def display_user_homepage():
     """ Displays homepage """
 
     file = Document.query.get(3)
-    # testing this for now -- will remove once satisfied with results of db queries
 
-    # searches = file.searches
-        # matches = user_search.query.filter(user_search.search_id == search_id)
-
-    return render_template('homepage.html', file=file)
-    # Took these out of route for now
-    # text = bytes.decode(file.text)
-    # return render_template('homepage.html', file=file, text=text)
+    return render_template('user_homepage.html', file=file)
 
 
 @app.route('/user_groups')
@@ -91,6 +84,47 @@ def display_groups():
     groups = jsonify(groups)
 
     return groups
+
+
+@app.route('/owner_home')
+def display_document_owner_homepage():
+    """ Displays the document of user's choice """
+
+    file = Document.query.get(3)
+
+    text = bytes.decode(file.text)
+    # decodes byte string
+
+    return render_template("owner_homepage.html", file=file, text=text)
+
+
+@app.route('/stats_view')
+def display_doc_stats():
+    """ Displays document statistics for document owner """
+
+    file = Document.query.get(3)
+    searches = file.searches
+    search_phrase_set = set()
+    search_tuples = []
+
+    for search_obj in searches:
+        search_phrase_set.add(search_obj.search_phrase)
+    
+    for search_phrase in search_phrase_set:
+        searches_w_phrase = Search.query.filter(Search.search_phrase==search_phrase).all()
+        count = len(searches_w_phrase)
+        search_tuple = (search_phrase, count)
+        search_tuples.append(search_tuple)
+
+    def Sort_Tuple(tup):  
+   
+        return(sorted(tup, key = lambda x: x[1], reverse=True))   
+
+    search_tuples = Sort_Tuple(search_tuples)
+
+    print('sorted : ', search_tuples)
+    
+    return render_template('stats_view.html', file=file, search_tuples=search_tuples)
 
 
 @app.route('/upload_file')
