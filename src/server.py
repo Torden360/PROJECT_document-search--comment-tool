@@ -28,7 +28,7 @@ app.secret_key = "ABC"
 def display_homepage():
     """ Displays homepage """
 
-    file = Document.query.get(1)
+    file = Document.query.get(3)
     # testing this for now -- will remove once satisfied with results of db queries
 
     # searches = file.searches
@@ -44,7 +44,7 @@ def display_homepage():
 def display_groups():
     """ Displays user's groups """
 
-    file = Document.query.get(1)
+    file = Document.query.get(3)
     # testing this for now -- will remove once satisfied with results of db queries
 
     searches = file.searches
@@ -53,21 +53,40 @@ def display_groups():
 
     for user_search in searches:
         group = user_search.groups
+        search_tuples = []
+
         if group:
             search_phrase = user_search.search_phrase
+            search_tuples.append(search_phrase)
+
             matches = user_search.search_matches
             matches_list = []
-            groups.append((search_phrase, matches_list))
+            search_tuples.append(matches_list)
+
             for match in matches:
                 match_content = match.match_content
                 notes = match.notes
+                content = []
+
+                content.append(match_content)
+
                 if notes:
                     note = notes[0].note_content
-                    content = (match_content, note)
-                else:
-                    content = (match_content)
+                    content.append(note)
 
+                content = tuple(content)
                 matches_list.append(content)
+            print('this is content: ', content)
+            print('')
+
+            search_tuples.append(matches_list)
+            search_tuples = tuple(search_tuples)
+
+            groups.append(search_tuples)
+
+        print('this is matches list: ', matches_list)
+    print('')
+    print('this is the groups list: ', groups)
 
     groups = jsonify(groups)
 
