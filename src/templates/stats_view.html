@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Stats for: {{file.name}}{% endblock %}
+
+{% block bodycontent %}
+
+<h1>Viewing Statistics For File: {{file.name}}</h1>
+<div class="stat_card">
+{% for search in search_tuples %}
+    <div class="stat">
+        <h3>{{search[0]}}</h3>
+        <p>Count: {{search[1]}}</p>
+    </div>
+{% endfor %}
+</div>
+
+{% endblock %}
