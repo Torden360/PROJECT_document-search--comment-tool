@@ -18,6 +18,7 @@
 
     <div class="match_container">
         {% if matches %}
+             <button class="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
             {% for match in matches %}
             <div class="matches" data-start="1" data-end="3"> <span class="close_match">x</span> 
                 <label class="match_result"> {{match}} </label>
