@@ -16,7 +16,12 @@
 }
 
 #save_matches_button {
+    margin-bottom: 10px;
+}
+
+#save_matches_button:last-of-type {
     margin-top: 10px;
+    margin-bottom: 0px;
 }
 
 .note {
@@ -90,3 +95,44 @@
 }
 
 .close_match:hover {background: #bbb;}
+
+.card {
+    display: flex;
+    width: 30vw;
+    height: 74vh;
+    overflow: hidden;
+    /* box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16), 0 2px 10px 0 rgba(0,0,0,0.12); */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    margin-top: 16px!important;
+    margin-bottom: 16px!important;
+    padding: 0.01em 16px;
+    opacity: 0.2;
+    background-color: #cabdda;
+    border-radius: 5px;
+    /* rounded corners */
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    /* background: #bbb; */
+    opacity: 1;
+  }
+
+.card_container {
+    padding: 0.01em 16px;
+}
+
+.stat_card {
+    display: flex;
+    padding: 20px;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.stat {
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: space-around;
+    background-color: #cabdda;
+}
