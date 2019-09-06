@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %} User Homepage {% endblock %}
+
+{% block bodycontent %}
+    <h1> User Homepage </h1>
+    <h3> Viewing saves for document: {{file.name}} </h3>
+
+    <script>
+    function createDiv(tuple) {
+        let insertedGroupDiv = document.createElement('div');
+        let searchPhraseDiv = document.createElement('h2');
+
+        insertedGroupDiv.setAttribute('class', 'group');
+        searchPhraseDiv.setAttribute('class', 'perSearch');
+
+        let saveButton = document.createElement('button');
+        saveButton.setAttribute('class', 'save_matches_button');
+        saveButton.setAttribute('data-search-id', 'search_id');
+        saveButton.setAttribute('id', 'save_matches_button');
+        // TODO: make this search_id dynamic
+        saveButton.innerText = "Save";
+    
+        let searchPhrase = tuple[0];
+        let matchesList = tuple[1];
+
+        // console.log(matchesList);
+
+        searchPhraseDiv.innerText = searchPhrase;
+        insertedGroupDiv.append(searchPhraseDiv);
+
+        // console.log(typeof matchesList);
+        // console.log(matchesList.length);
+
+        matchesList.forEach((element) => {
+            let matchDiv = document.createElement('div');
+            matchDiv.setAttribute('class', 'match_result matches');
+            let matchContent = element[0];
+            let note = element[1];
+            let noteTextarea = null;
+
+            matchDiv.innerText = matchContent;
+            insertedGroupDiv.append(matchDiv);
+
+            if (note != null) {
+                noteTextarea = document.createElement('textarea');
+                noteTextarea.setAttribute('class', 'note');
+                noteTextarea.innerText = note;
+                insertedGroupDiv.append(noteTextarea);
+            }
+        });
+
+        insertedGroupDiv.append(saveButton);
+        
+        // console.log(tuple);
+
+        return insertedGroupDiv;
+    }
+
+
+    function getGroupDict() {
+      let groupDiv = document.querySelector('.groups');
+
+      fetch('/user_groups')
+      .then(response => response.json())
+      .then(data => {
+      // Here's a list of repos!
+        data.forEach((tuple, index) => {
+            console.log('tuple + index', tuple, index);
+            let insertedGroupDiv = createDiv(tuple);
+            console.log('')
+            groupDiv.appendChild(insertedGroupDiv);
+        });
+      });
+    }
+    
+    window.onload = getGroupDict
+
+    </script>
+    <div class="groups"></div>
+
+    <p>
+        {{file}}
+    </p>
+{% endblock %}
+
+<!--taking this out for now
+    <p id="file">
+{{text}}
+    </p> -->
