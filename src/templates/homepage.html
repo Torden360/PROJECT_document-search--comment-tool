@@ -8,37 +8,48 @@
     <h3> {{file.name}} </h3>
 
     <script>
-    function createDiv(searchMatchesList) {
+    function createDiv(tuple) {
         let insertedGroupDiv = document.createElement('div');
+        let searchPhraseDiv = document.createElement('h2');
+
+        insertedGroupDiv.setAttribute('class', 'group');
+        searchPhraseDiv.setAttribute('class', 'perSearch');
+    
+        let searchPhrase = tuple[0];
+        let matchesList = tuple[1];
+
+        // console.log(matchesList);
+
+        searchPhraseDiv.innerText = searchPhrase;
+        insertedGroupDiv.append(searchPhraseDiv);
+
+        // console.log(typeof matchesList);
+        // console.log(matchesList.length);
+
+        matchesList.forEach((element) => {
+            let matchDiv = document.createElement('div');
+            matchDiv.setAttribute('class', 'match_result matches');
+            let matchContent = element[0];
+            let note = element[1];
+            let noteTextarea = null;
+
+            matchDiv.innerText = matchContent;
+            insertedGroupDiv.append(matchDiv);
+
+            if (note != null) {
+                noteTextarea = document.createElement('textarea');
+                noteTextarea.setAttribute('class', 'note');
+                noteTextarea.innerText = note;
+                insertedGroupDiv.append(noteTextarea);
+            }
+        });
         
-        let noteDiv = document.createElement('div');
-        let matchDiv = document.createElement('div');
-        let searchPhrase = searchMatchesList[0];
-        let dict = searchMatchesList[1];
-        let matchContent = dict['match_content']
-        let note = dict['note']
-
-        console.log(searchMatchesList);
-
-        let insertedSearchPhrase = document.createTextNode(searchPhrase);
-        let insertedMatchContent = document.createTextNode(matchContent);
-        let insertedNoteContent = document.createTextNode(note);
-
-        matchDiv.innerHTML = matchContent;
-
-        insertedGroupDiv.append(searchPhrase);
-        insertedGroupDiv.append(matchDiv);
-        // insertedGroupDiv.appendChild(insertedMatchContent);
-        insertedGroupDiv.appendChild(insertedNoteContent);
-
-        // groupDiv.innerHTML = searchPhrase;
-        // matchContentDiv.innerText = matchContent;
-        // noteDiv.innerText = note;
-        // groupDiv.appendChild(matchContentDiv);
-        // groupDiv.appendChild(noteDiv);
+        // console.log(tuple);
 
         return insertedGroupDiv;
     }
+
+
     function getGroupDict() {
       let groupDiv = document.querySelector('.groups');
 
@@ -46,8 +57,10 @@
       .then(response => response.json())
       .then(data => {
       // Here's a list of repos!
-        data.forEach(searchMatchesList => {
-            let insertedGroupDiv = createDiv(searchMatchesList);
+        data.forEach((tuple, index) => {
+            console.log('tuple + index', tuple, index);
+            let insertedGroupDiv = createDiv(tuple);
+            console.log('')
             groupDiv.appendChild(insertedGroupDiv);
         });
       });
