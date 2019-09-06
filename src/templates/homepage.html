@@ -8,14 +8,36 @@
     <h3> {{file.name}} </h3>
 
     <script>
-    function createDiv(tuple) {
-        let newDiv = document.createElement('div');
-        let searchPhrase = tuple[0];
-        let dict = tuple[1];
+    function createDiv(searchMatchesList) {
+        let insertedGroupDiv = document.createElement('div');
+        
+        let noteDiv = document.createElement('div');
+        let matchDiv = document.createElement('div');
+        let searchPhrase = searchMatchesList[0];
+        let dict = searchMatchesList[1];
+        let matchContent = dict['match_content']
+        let note = dict['note']
 
-        newDiv.innerText = searchPhrase;
+        console.log(searchMatchesList);
 
-        return newDiv;
+        let insertedSearchPhrase = document.createTextNode(searchPhrase);
+        let insertedMatchContent = document.createTextNode(matchContent);
+        let insertedNoteContent = document.createTextNode(note);
+
+        matchDiv.innerHTML = matchContent;
+
+        insertedGroupDiv.append(searchPhrase);
+        insertedGroupDiv.append(matchDiv);
+        // insertedGroupDiv.appendChild(insertedMatchContent);
+        insertedGroupDiv.appendChild(insertedNoteContent);
+
+        // groupDiv.innerHTML = searchPhrase;
+        // matchContentDiv.innerText = matchContent;
+        // noteDiv.innerText = note;
+        // groupDiv.appendChild(matchContentDiv);
+        // groupDiv.appendChild(noteDiv);
+
+        return insertedGroupDiv;
     }
     function getGroupDict() {
       let groupDiv = document.querySelector('.groups');
@@ -24,9 +46,9 @@
       .then(response => response.json())
       .then(data => {
       // Here's a list of repos!
-        data.forEach(tuple => {
-            let newDiv = createDiv(tuple);
-            groupDiv.appendChild(newDiv);
+        data.forEach(searchMatchesList => {
+            let insertedGroupDiv = createDiv(searchMatchesList);
+            groupDiv.appendChild(insertedGroupDiv);
         });
       });
     }
