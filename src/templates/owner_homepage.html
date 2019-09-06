@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Doc Owner Homepage{% endblock %}
+
+{% block bodycontent %}
+<h1>Document Owner Homepage </h1>
+
+<div class="card">
+    <div class="card_container">
+        <div id="file">
+    {{text}}
+        </div>
+    </div>
+
+</div>
+<!-- <script>
+
+const closeMatch  = document.querySelectorAll('.close_match');
+
+// // closes match on click x
+for (let i = 0; i < closeMatch.length; i++) {
+    closeMatch[i].addEventListener('click', function() {
+        this.parentElement.style.display = 'none';
+        this.parentElement.removeAttribute('class');
+    });
+}
+
+// would have to be on the containing div, but if still saving even when view closes, can try:
+// Element.removeAttribute('class')
+// to remove the element from being grouped with the matches class query selector
+
+    // Alert group notes were saved
+
+    // select save button
+    const groupSaveBtn = document.getElementById('save_matches_button');
+    
+    function saveMatchData() {
+
+        console.log('This is saveMatchData!')
+
+        const matchData = {};
+
+        // select matches that have not been x'd out 
+        // can now index into this array of objects
+        const matches = document.querySelectorAll('.matches');
+
+        // get search_id and put into dictionary
+        matchData['search_id'] = groupSaveBtn.getAttribute('data-search-id');
+
+        matchData['matches'] = [];
+
+        for (let i = 0; i < matches.length; i++) {
+            console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
+                        matches[i].getAttribute("data-start"));
+
+            let notes = null;
+
+            // get match note value and determine if user has written notes
+            if (matches[i].children[2].value > matches[i].children[2].defaultValue) {
+                console.log('within the if statement!');
+                notes = matches[i].children[2].value;
+                console.log(notes);
+            }
+
+            console.log('this ish notess ', notes);
+
+            matchData['matches'].push({
+                // get content of match notes
+                'match_content': matches[i].innerText,
+
+                // get start_offset
+                'start_offset': matches[i].getAttribute('data-start'),
+            
+                // get end_offset of matches
+                'end_offset': matches[i].getAttribute('data-end'),
+
+                // set notes value
+                'notes': notes,
+            });
+        }
+
+        console.log('matchData ahhh: ', matchData);
+
+        // post method to /save_grouped_matches with Fetch
+        fetch('/save_grouped_matches', {
+            method: 'POST',
+            body: JSON.stringify(matchData),
+            headers: new Headers({
+                "content-type": "application/json"
+            })
+        })
+        .then(response => response.json())
+        .then(response => console.log('Success:', JSON.stringify(response)))
+        .catch(error => console.error('Error:', error));
+    }
+
+    // add onclick listener
+    groupSaveBtn.addEventListener('click', saveMatchData);
+
+</script> -->
+<!-- Am not using the script tag atm, but I think there are a lot of useful things in it 
+that I may be able to transition for this page -->
+
+{% endblock %}
