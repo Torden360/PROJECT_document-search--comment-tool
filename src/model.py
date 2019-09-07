@@ -6,6 +6,8 @@ db = SQLAlchemy()
 
 # ----------- Model Definitions ----------
 
+# TODO: add users table 
+
 class Document(db.Model):
     """ Uploaded document """
 
@@ -15,6 +17,7 @@ class Document(db.Model):
     text = db.Column(db.LargeBinary, nullable=False)
     # db.LargeBinary stores the file in a bytea column, sqlalchemy takes care of conversion
     name = db.Column(db.String(60))
+    # TODO: add document owner 
 
     def __repr__(self):
 
