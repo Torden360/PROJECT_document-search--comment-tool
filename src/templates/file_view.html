@@ -3,6 +3,12 @@
 {% block title %}Viewing: {{file.name}}{% endblock %}
 
 {% block bodycontent %}
+
+<!-- <div>
+    Your document's unique URL is: /file_view/{{file.document_id}}/{{file.name}}
+    The passcode for youself and others to view your document is: {{passcode}}
+</div> -->
+
 <div id="search">
     <form id="search_bar" action="/search_view">
         <input id="search_bar" type="text" name="search_phrase" placeholder="Search">
