@@ -14,6 +14,8 @@ from db_functions import load_text, store_search, create_group, store_match, sto
 
 from search import search
 
+import random
+
 
 ALLOWED_EXTENSIONS = {'txt'}
 # not sure that I will use this/if I need it when I am forcing the accept params
@@ -28,7 +30,7 @@ app.secret_key = "ABC"
 def display_user_homepage():
     """ Displays homepage """
 
-    file = Document.query.get(3)
+    file = Document.query.get(1)
 
     return render_template('user_homepage.html', file=file)
 
@@ -37,7 +39,7 @@ def display_user_homepage():
 def display_groups():
     """ Displays user's groups """
 
-    file = Document.query.get(3)
+    file = Document.query.get(1)
     # testing this for now -- will remove once satisfied with results of db queries
 
     searches = file.searches
@@ -77,7 +79,6 @@ def display_groups():
 
             groups.append(search_tuples)
 
-        print('this is matches list: ', matches_list)
     print('')
     print('this is the groups list: ', groups)
 
@@ -90,7 +91,7 @@ def display_groups():
 def display_document_owner_homepage():
     """ Displays the document of user's choice """
 
-    file = Document.query.get(3)
+    file = Document.query.get(1)
 
     text = bytes.decode(file.text)
     # decodes byte string
@@ -102,7 +103,7 @@ def display_document_owner_homepage():
 def display_doc_stats():
     """ Displays document statistics for document owner """
 
-    file = Document.query.get(3)
+    file = Document.query.get(1)
     searches = file.searches
     search_phrase_set = set()
     search_tuples = []
@@ -150,6 +151,34 @@ def display_document():
     text = bytes.decode(file.text)
     # decodes byte string
 
+    # need to store session
+
+    new_number = random.sample(range(268), 3)
+
+    # new_number = 
+
+    print(new_number)
+
+    # passcode = str(file.document_id) + secure_filename(file.name) + str(new_number.split.rstrip())
+
+    return render_template("file_view.html", file=file, text=text) 
+    # , passcode=passcode)
+
+
+
+@app.route('/<document_id>/<document_name>')
+def display_document_w_url(document_id, document_name):
+    """ Displays the document of user's choice """
+
+    file = Document.query.get(document_id)
+
+    doc_id = file.document_id
+
+    text = bytes.decode(file.text)
+    # decodes byte string
+
+    # need to store session
+
     return render_template("file_view.html", file=file, text=text)
 
 
@@ -174,6 +203,18 @@ def search_document():
 
     return render_template("file_view.html", file=file, text=text, 
         search_phrase=search_phrase, search_id=search_id, matches=matches)
+
+
+# not working right now
+# @app.route('/enter_passcode')
+# def asks_user_to_enter_passcode():
+#     """ Asks user to enter passcode to view document """
+
+#     if Document.password == user_input:
+#         # redirect("/file_view")
+
+#     else:
+#         flash("Please enter the correct password")
 
 
 # This route is incomplete
