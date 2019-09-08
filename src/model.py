@@ -6,8 +6,6 @@ db = SQLAlchemy()
 
 # ----------- Model Definitions ----------
 
-# TODO: add users table 
-
 class Document(db.Model):
     """ Uploaded document """
 
@@ -17,11 +15,32 @@ class Document(db.Model):
     text = db.Column(db.LargeBinary, nullable=False)
     # db.LargeBinary stores the file in a bytea column, sqlalchemy takes care of conversion
     name = db.Column(db.String(60))
-    # TODO: add document owner 
+    passcode = db.Column(db.String(60), nullable=False)
+    # TODO: make passcode a passwordType
+    doc_owner = db.Column(db.String(60), nullable=False)
 
     def __repr__(self):
 
         return f'<document_id = {self.document_id} name = {self.name}>'
+
+
+class User(db.Model):
+    """ Document users """
+
+    __tablename__ = "document_users"
+
+    user_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    username = db.Column(db.String(60), nullable=False)
+    document_id = db.Column(db.Integer, db.ForeignKey('documents.document_id'))
+    is_doc_owner = db.Column(db.Boolean)
+    # may need to add nullable field boolean for doc_owner
+
+    document = db.relationship('Document', backref='document_users')
+    group = db.relationship('Group', backref='document_users')
+
+    def __repr__(self):
+
+        return f'<document_id = {self.document_id} name = {self.username}>'
 
 
 class Search(db.Model):
@@ -32,7 +51,6 @@ class Search(db.Model):
     search_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     search_phrase = db.Column(db.String(150), nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.document_id'))
-    # TODO: will probably add count later to store num times phrase was searched
 
     document = db.relationship('Document', backref='searches')
     group = db.relationship('Group', backref="searches")
@@ -55,7 +73,9 @@ class Search_Match(db.Model):
 
 # TODO: think I will need to add group member_id, group_id
 
-    search = db.relationship('Search', backref="search_matches")
+    search = db.relationship('Search', backref='search_matches')
+
+# TODO: add __repr__
 
 
 # ----------- Add After MVP ------------
@@ -65,11 +85,18 @@ class Group(db.Model):
     __tablename__ = "groups"
 
     group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
+    search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'), nullable=False)
+    # match_id = db.Column(db.Integer, db.ForeignKey('search_matches.match_id'))
+    # TODO: not sure if I want match_id here
+    user_id = db.Column(db.Integer, db.ForeignKey('document_users.user_id'), nullable=False)
+    # TODO: need to add user_id to instantiate fn and to input variables
 
-    search = db.relationship('Search', backref="groups")
+    search = db.relationship('Search', backref='groups')
+    user = db.relationship('User', backref='groups')
 
 #TODO: I forgot to add group_id to search_matches + relationship, and I'm payin' for it.
+
+# TODO: add __repr__
 
 
 # TODO: think I will get rid of this table--DO NOT DELETE UNTIL COMPLETE DB
@@ -91,8 +118,10 @@ class Note(db.Model):
     match_id = db.Column(db.Integer, db.ForeignKey('search_matches.match_id'), nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('groups.group_id'), nullable=False)
 
-    match = db.relationship('Search_Match', backref="notes")
-    group = db.relationship('Group', backref="notes")
+    match = db.relationship('Search_Match', backref='notes')
+    group = db.relationship('Group', backref='notes')
+
+    # TODO: add __repr__
 
 
 # ----------- Helper Functions ------------
