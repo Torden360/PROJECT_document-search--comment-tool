@@ -4,10 +4,14 @@
 
 {% block bodycontent %}
 
-<!-- <div>
-    Your document's unique URL is: /file_view/{{file.document_id}}/{{file.name}}
+<div>
+    {% if passcode %}
+    Your document's unique URL is: /file_view?did={{file.document_id}}&?name={{file.name}}
     The passcode for youself and others to view your document is: {{passcode}}
-</div> -->
+    {% else %}
+    You are viewing the uploaded file: {{file.name}}
+    {% endif %}
+</div>
 
 <div id="search">
     <form id="search_bar" action="/search_view">
