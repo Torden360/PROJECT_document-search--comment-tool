@@ -5,14 +5,39 @@
 {% block bodycontent %}
 <h1>Document Owner Homepage </h1>
 
-<div class="card">
+<div class="card" data-id="{{file.document_id}}">
     <div class="card_container">
         <div id="file">
     {{text}}
         </div>
     </div>
-
 </div>
+<script>
+    const card = document.querySelectorAll('.card');
+    console.log('card: ', card);
+
+    for(let i = 0; i < card.length; i++) {
+        card[i].addEventListener('click', function() {
+            document_id = this.getAttribute('data-id');
+
+            fetch('/owner_home', {
+                method: 'POST',
+                // redirect: 'follow',
+                body: JSON.stringify(document_id),
+                headers: new Headers({
+                    "content-type": "application/json"
+                })
+            })
+            // .then(response => response.json())
+            // .then(response => console.log('Success:', JSON.stringify(response)))
+            .catch(error => console.error('Error:', error));
+        })
+    };
+
+    // function goToStatView() {
+    // }
+
+</script>
 <!-- <script>
 
 const closeMatch  = document.querySelectorAll('.close_match');
@@ -79,12 +104,9 @@ for (let i = 0; i < closeMatch.length; i++) {
             });
         }
 
-        console.log('matchData ahhh: ', matchData);
-
-        // post method to /save_grouped_matches with Fetch
-        fetch('/save_grouped_matches', {
-            method: 'POST',
-            body: JSON.stringify(matchData),
+        fetch('/stats_view', {
+            method: 'GET',
+            body: JSON.stringify(docData),
             headers: new Headers({
                 "content-type": "application/json"
             })
