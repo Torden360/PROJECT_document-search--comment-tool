@@ -1,12 +1,14 @@
-from model import (Document, Search, Search_Match, Group, Note, connect_to_db, db) 
+from model import (User, Document, Search, Search_Match, Group, Note, connect_to_db, db) 
 
-def load_text(document, name):
+def load_text(document, name, passcode, doc_owner):
         """ Load the text from the document into database, and create new db object """
 
         text = document.read()
 
         document = Document(text=text,
-                            name=name, 
+                            name=name,
+                            passcode=passcode,
+                            doc_owner=doc_owner 
                             )
 
         db.session.add(document)
@@ -16,9 +18,23 @@ def load_text(document, name):
         return document
 
 
+def create_user(username, document_id, is_doc_owner=False):
+    """Create new user of document indicated"""
+
+    user = User(username=username,
+                document_id=document_id,
+                is_doc_owner=is_doc_owner
+                )
+
+    db.session.add(user)
+
+    db.session.commit()
+
+    return user
+
+
 def store_search(search_phrase, document_id):
     """ Store search information into the database """
-
 
     search = Search(search_phrase=search_phrase,
                     document_id=document_id)
@@ -29,9 +45,10 @@ def store_search(search_phrase, document_id):
     return search.search_id
 
 
-def create_group(search_id):
+def create_group(search_id, user_id):
 
-    group = Group(search_id=search_id)
+    group = Group(search_id=search_id,
+                  user_id=user_id)
 
     db.session.add(group)
     db.session.commit()
@@ -60,3 +77,8 @@ def store_notes(note_content, match_id, group_id):
 
     db.session.add(note)
     db.session.commit()
+
+
+def update_group(group_id, match_id, note_id, note_content):
+
+    pass
