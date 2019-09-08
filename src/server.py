@@ -3,23 +3,18 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, jsonify, make_response, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import (Document, Search, Search_Match, connect_to_db, db) 
+from model import (User, Document, Search, Search_Match, connect_to_db, db) 
 # will add Group, Group_Match, and Comment after MVP
 
 from werkzeug.utils import secure_filename
 
 from sqlalchemy import func, distinct
 
-from db_functions import load_text, store_search, create_group, store_match, store_notes
+from db_functions import load_text, store_search, create_user, create_group, store_match, store_notes
 
 from search import search
 
 import random
-
-
-ALLOWED_EXTENSIONS = {'txt'}
-# not sure that I will use this/if I need it when I am forcing the accept params
-# on the html itself. Which is better to do that with?/More secure
 
 app = Flask(__name__)
 
@@ -28,9 +23,10 @@ app.secret_key = "ABC"
 
 @app.route('/')
 def display_user_homepage():
-    """ Displays homepage """
+    """ Displays user homepage """
 
     file = Document.query.get(1)
+    # TODO: hardcoded until put if statement in template
 
     return render_template('user_homepage.html', file=file)
 
@@ -39,8 +35,10 @@ def display_user_homepage():
 def display_groups():
     """ Displays user's groups """
 
-    file = Document.query.get(1)
-    # testing this for now -- will remove once satisfied with results of db queries
+    doc_id = session.get('did')
+    user_id = session.get('user_id')
+
+    file = Document.query.get(doc_id)
 
     searches = file.searches
 
@@ -51,6 +49,9 @@ def display_groups():
         search_tuples = []
 
         if group:
+
+            # need to make this conditional on user
+
             search_phrase = user_search.search_phrase
             search_tuples.append(search_phrase)
 
@@ -79,6 +80,9 @@ def display_groups():
 
             groups.append(search_tuples)
 
+        else:
+            flash('You have no saved groups')
+
     print('')
     print('this is the groups list: ', groups)
 
@@ -87,23 +91,39 @@ def display_groups():
     return groups
 
 
-@app.route('/owner_home')
+@app.route('/owner_home', methods=['GET', 'POST'])
 def display_document_owner_homepage():
     """ Displays the document of user's choice """
 
-    file = Document.query.get(1)
+    if request.method == 'POST':
+        req = request.get_json()
+        print('were in req: ', req)
+        # res = make_response(jsonify(req), 200)
 
-    text = bytes.decode(file.text)
-    # decodes byte string
+        return redirect('/stats_view', req)
 
-    return render_template("owner_homepage.html", file=file, text=text)
+    else:
+
+        file = Document.query.get(1)
+        # TODO: hardcoded for now
+
+        text = bytes.decode(file.text)
+        # decodes byte string
+
+        return render_template("owner_homepage.html", file=file, text=text)
 
 
-@app.route('/stats_view')
+@app.route('/stats_view', methods=['POST'])
 def display_doc_stats():
     """ Displays document statistics for document owner """
 
-    file = Document.query.get(1)
+    # ask how to make the fetch a get request instead of post
+    req = request.get_json()
+
+    print(req, 'this is req in stats_view')
+    file = Document.query.get(int(req))
+    # TODO: hardcoded for now
+
     searches = file.searches
     search_phrase_set = set()
     search_tuples = []
@@ -135,51 +155,60 @@ def upload_document():
     return render_template("upload_file.html")
 
 
-@app.route('/file_view', methods=['POST'])
+@app.route('/file_view', methods=['GET', 'POST'])
 def display_document():
     """ Displays the document of user's choice """
 
-    file = request.files['file']
-    # retrieves the uploaded file
+    if request.method == 'POST':
 
-    filename = request.form.get('filename')
-    # gets the filename that was entered by the user
+        file = request.files['file']
+        # retrieves the uploaded file
 
-    file = load_text(file, filename)
-    # call load_text FN with the file and filename
+        filename = request.form.get('filename')
+        # gets the filename that was entered by the user
 
-    text = bytes.decode(file.text)
-    # decodes byte string
+        end_number = random.randint(1, 268)
+        start_number = random.randint(14,99)
 
-    # need to store session
+        passcode = str(start_number) + secure_filename(filename[0:2]) + str(end_number)
 
-    new_number = random.sample(range(268), 3)
+        doc_owner = request.form.get('documentowner')
 
-    # new_number = 
+        file = load_text(file, filename, passcode, doc_owner)
+        # call load_text FN with the file and filename
 
-    print(new_number)
+        user = create_user(doc_owner, file.document_id, True)
 
-    # passcode = str(file.document_id) + secure_filename(file.name) + str(new_number.split.rstrip())
+        session['user_id'] = user.user_id
 
-    return render_template("file_view.html", file=file, text=text) 
-    # , passcode=passcode)
+        text = bytes.decode(file.text)
+        # decodes byte string
 
+        return render_template("file_view.html", file=file, text=text, passcode=passcode)
+    
+    if session.get('passcode'):
+    # if session has passcode, 
 
+        doc_id = session.get('did')
 
-@app.route('/<document_id>/<document_name>')
-def display_document_w_url(document_id, document_name):
-    """ Displays the document of user's choice """
+        user_id = session.get('user_id')
 
-    file = Document.query.get(document_id)
+        file = Document.query.get(doc_id)
 
-    doc_id = file.document_id
+        text = bytes.decode(file.text)
+        # decodes byte string
 
-    text = bytes.decode(file.text)
-    # decodes byte string
+        # need to store session
 
-    # need to store session
+        return render_template("file_view.html", file=file, text=text)
 
-    return render_template("file_view.html", file=file, text=text)
+    else:
+
+        doc_id = request.args.get('did')
+
+        session["did"] = doc_id
+
+        return redirect('/authenticate')
 
 
 
@@ -226,8 +255,9 @@ def save_matches():
 
     print('This is json from front end!!', req)
 
+    user_id = session.get('user_id')
     search_id = req['search_id']
-    group_id = create_group(search_id)
+    group_id = create_group(search_id, user_id)
 
     for match in req['matches']:
 
@@ -241,6 +271,37 @@ def save_matches():
             note_content = match['notes']
             store_notes(note_content, match_id, group_id)
 
+    # TODO: this flash message is currently not working, just mocked out for now
+    flash('Your search matches and notes have been saved')
+    
+    res = make_response(jsonify(req), 200)
+
+    return res
+
+
+@app.route('/update_grouped_matches', methods=['POST'])
+def update_matches():
+    """ Updates the matches and notes in a group """
+
+    req = request.get_json()
+
+    print('This is json from front end!!', req)
+
+    search_id = req['search_id']
+    # group_id = create_group(search_id)
+
+    for match in req['matches']:
+
+        start_offset = match['start_offset']
+        end_offset = match['end_offset']
+        match_content = match['match_content']
+
+        # match_id = store_match(search_id, start_offset, end_offset, match_content)
+
+        if match['notes']:
+            note_content = match['notes']
+            # store_notes(note_content, match_id, group_id)
+
     # this flash message is currently not working, just mocked out for now
     flash('Your search matches and notes have been saved')
     
@@ -249,6 +310,43 @@ def save_matches():
 
     return res
 
+
+@app.route('/authenticate')
+def get_passcode():
+
+    return render_template('enter_passcode.html')
+
+
+@app.route('/authenticate', methods=['POST'])
+def authenticate_passcode():
+    """Process passcode."""
+
+    # Get form variables
+    username = request.form["username"]
+    passcode = request.form["passcode"]
+
+    doc_id = session.get('did')
+
+    file = Document.query.get(doc_id)
+
+    if file.passcode != passcode:
+        flash("Passcode is incorrect")
+        return redirect("/authenticate")
+
+    newuser = request.form['newuser']
+
+    if newuser:
+        user = create_user(username, doc_id)
+        
+    else:
+        user = User.query.filer_by(username=username).first()
+
+    session["user_id"] = user.user_id
+    session["passcode"] = file.passcode
+
+    flash("You are welcome to view")
+    return redirect(f"/file_view")
+    # this part is unnecessary with the session storing did {did=doc_id}{user.user_id}/")
 
 
 if __name__ == "__main__":
