@@ -7,81 +7,173 @@
     <h3> Viewing saves for document: {{file.name}} </h3>
 
     <script>
-    function createDiv(tuple) {
-        let insertedGroupDiv = document.createElement('div');
-        let searchPhraseDiv = document.createElement('h2');
+        function createDiv(tuple) {
+            let insertedGroupDiv = document.createElement('div');
+            let searchPhraseDiv = document.createElement('h2');
 
-        insertedGroupDiv.setAttribute('class', 'group');
-        searchPhraseDiv.setAttribute('class', 'perSearch');
+            insertedGroupDiv.setAttribute('class', 'group');
+            searchPhraseDiv.setAttribute('class', 'perSearch');
 
-        let saveButton = document.createElement('button');
-        saveButton.setAttribute('class', 'save_matches_button');
-        saveButton.setAttribute('data-search-id', 'search_id');
-        saveButton.setAttribute('id', 'save_matches_button');
-        // TODO: make this search_id dynamic
-        saveButton.innerText = "Save";
-    
-        let searchPhrase = tuple[0];
-        let matchesList = tuple[1];
-
-        // console.log(matchesList);
-
-        searchPhraseDiv.innerText = searchPhrase;
-        insertedGroupDiv.append(searchPhraseDiv);
-
-        // console.log(typeof matchesList);
-        // console.log(matchesList.length);
-
-        matchesList.forEach((element) => {
-            let matchDiv = document.createElement('div');
-            matchDiv.setAttribute('class', 'match_result matches');
-            let matchContent = element[0];
-            let note = element[1];
-            let noteTextarea = null;
-
-            matchDiv.innerText = matchContent;
-            insertedGroupDiv.append(matchDiv);
-
-            if (note != null) {
-                noteTextarea = document.createElement('textarea');
-                noteTextarea.setAttribute('class', 'note');
-                noteTextarea.innerText = note;
-                insertedGroupDiv.append(noteTextarea);
-            }
-        });
-
-        insertedGroupDiv.append(saveButton);
+            let saveButton = document.createElement('button');
+            saveButton.setAttribute('class', 'save_matches_button');
+            saveButton.setAttribute('data-search-id', 'search_id');
+            saveButton.setAttribute('id', 'save_matches_button');
+            // TODO: make this search_id dynamic
+            saveButton.innerText = "Save";
         
-        // console.log(tuple);
+            let searchPhrase = tuple[0];
+            let matchesList = tuple[1];
 
-        return insertedGroupDiv;
-    }
+            // console.log(matchesList);
+
+            searchPhraseDiv.innerText = searchPhrase;
+            insertedGroupDiv.append(searchPhraseDiv);
+
+            // console.log(typeof matchesList);
+            // console.log(matchesList.length);
+
+            matchesList.forEach((element) => {
+                let matchDiv = document.createElement('div');
+                matchDiv.setAttribute('class', 'match_result matches');
+                let matchContent = element[0];
+                let note = element[1];
+                let noteTextarea = null;
+
+                matchDiv.innerText = matchContent;
+                insertedGroupDiv.append(matchDiv);
+
+                if (note != null) {
+                    noteTextarea = document.createElement('textarea');
+                    noteTextarea.setAttribute('class', 'note');
+                    noteTextarea.innerText = note;
+                    insertedGroupDiv.append(noteTextarea);
+                }
+            });
+
+            insertedGroupDiv.append(saveButton);
+            
+            // console.log(tuple);
+
+            return insertedGroupDiv;
+        }
 
 
-    function getGroupDict() {
-      let groupDiv = document.querySelector('.groups');
+        function getGroupDict() {
+        let groupDiv = document.querySelector('.groups');
 
-      fetch('/user_groups')
-      .then(response => response.json())
-      .then(data => {
-      // Here's a list of repos!
-        data.forEach((tuple, index) => {
-            console.log('tuple + index', tuple, index);
-            let insertedGroupDiv = createDiv(tuple);
-            console.log('')
-            groupDiv.appendChild(insertedGroupDiv);
+        fetch('/user_groups')
+        .then(response => response.json())
+        .then(data => {
+        // Here's a list of repos!
+            data.forEach((tuple, index) => {
+                console.log('tuple + index', tuple, index);
+                let insertedGroupDiv = createDiv(tuple);
+                console.log('')
+                groupDiv.appendChild(insertedGroupDiv);
+            });
+
+            const groupSaveBtn = document.querySelectorAll('.save_matches_button');
+            console.log(groupSaveBtn, 'groupSaveButtons !!!')   
+            // add onclick listener
+            for (let i = 0; i < groupSaveBtn.length; i++) {
+                groupSaveBtn[i].addEventListener('click', saveMatchData);
+            };
+
+
+
         });
-      });
-    }
+        }
+        
+        window.onload = getGroupDict
+
+        const closeMatch  = document.querySelectorAll('.close_match');
+            
+        // closes match on click x
+        for (let i = 0; i < closeMatch.length; i++) {
+            closeMatch[i].addEventListener('click', function() {
+                this.parentElement.style.display = 'none';
+                this.parentElement.removeAttribute('class');
+            });
+        }
+            
+        // would have to be on the containing div, but if still saving even when view closes, can try:
+        // Element.removeAttribute('class')
+        // to remove the element from being grouped with the matches class query selector
+            
+        // Alert group notes were saved
     
-    window.onload = getGroupDict
+        // select save button
+        
+        function saveMatchData() {
+            
+            console.log('This is saveMatchData!')
+            
+            const matchData = {};
+            
+            // select matches that have not been x'd out 
+            // can now index into this array of objects
+            const matches = document.querySelectorAll('.match_result matches');
+            
+            // get search_id and put into dictionary
+            // matchData['search_id'] = groupSaveBtn.getAttribute('data-search-id');
+            // don't need this anymore
+    
+            matchData['matches'] = [];
+            
+            for (let i = 0; i < matches.length; i++) {
+                console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
+                            matches[i].getAttribute("data-start"));
+    
+                let notes = null;
+            
+                // get match note value and determine if user has written notes
+                if (matches[i].children[2].value > matches[i].children[2].defaultValue) {
+                    console.log('within the if statement!');
+                    notes = matches[i].children[2].value;
+                    console.log(notes);
+                }
+            
+                console.log('this ish notess ', notes);
+            
+                matchData['matches'].push({
+                    // get content of match notes
+                    'match_content': matches[i].innerText,
 
+                    // get start_offset
+                    'start_offset': matches[i].getAttribute('data-start'),
+                
+                    // get end_offset of matches
+                    'end_offset': matches[i].getAttribute('data-end'),
+
+                    // set notes value
+                    'notes': notes,
+                });
+            }
+            
+            console.log('matchData ahhh: ', matchData);
+            
+            // post method to /save_grouped_matches with Fetch
+            fetch('/update_grouped_matches', {
+                method: 'POST',
+                body: JSON.stringify(matchData),
+                headers: new Headers({
+                    "content-type": "application/json"
+                })
+            })
+            .then(response => response.json())
+            .then(response => console.log('Success:', JSON.stringify(response)))
+            .catch(error => console.error('Error:', error));
+        }
+     
     </script>
-    <div class="groups"></div>
 
+    <div class="groups"></div>
     <p>
         {{file}}
     </p>
+
+
+
 {% endblock %}
 
 <!--taking this out for now
