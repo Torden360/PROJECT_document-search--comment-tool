@@ -18,6 +18,8 @@ class Document(db.Model):
     passcode = db.Column(db.String(60), nullable=False)
     # TODO: make passcode a passwordType
     doc_owner = db.Column(db.String(60), nullable=False)
+    # I would want to do this instead, but don't have time to build out the other functionalities it requires
+    # owner_id = db.Column(db.Integer, db.ForeignKey('document_users.user_id') nullable=False)
 
     def __repr__(self):
 
