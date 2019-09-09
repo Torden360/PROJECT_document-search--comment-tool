@@ -4,45 +4,56 @@
 
 {% block bodycontent %}
 
-<div>
-    {% if passcode %}
-    Your document's unique URL is: /file_view?did={{file.document_id}}&?name={{file.name}}
-    The passcode for youself and others to view your document is: {{passcode}}
-    {% else %}
-    You are viewing the uploaded file: {{file.name}}
-    {% endif %}
-</div>
+<div class="background">
+    <div class="over-background">
 
-<div id="search">
-    <form id="search_bar" action="/search_view">
-        <input id="search_bar" type="text" name="search_phrase" placeholder="Search">
-        <input type="text" name="doc_id" value="{{file.document_id}}" hidden>
-        <input type="submit" hidden>
-    </form>
-</div>
-
-<div class="container">
-    <p id="file">
-{{text}}
-    </p>
-
-    <div class="match_container">
-        {% if matches %}
-             <button class="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
-            {% for match in matches %}
-            <div class="matches" data-start="1" data-end="3"> <span class="close_match">x</span> 
-                <label class="match_result"> {{match}} </label>
-                <textarea class="notes" row="10" col="50">Note: </textarea>
-            </div>
-            {% endfor %}
-            <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
-        {% endif %}
-        
-        {% if not matches %}
-        No match results found.
+        {% if passcode %}
+        <header>
+            <a href="/owner_home"> Homepage </a>
+        </header>
+        Your document's unique URL is: /file_view?did={{file.document_id}}&?name={{file.name}} <br>
+        The passcode for youself and others to view your document is: {{passcode}}
+        {% else %}
+        <header>
+                <a href="/"> Homepage </a>
+        </header>
+        You are viewing the uploaded file: {{file.name}}
         {% endif %}
     </div>
 
+    <div id="search">
+        <form id="search_bar" action="/search_view">
+            <input id="search_bar" type="text" name="search_phrase" placeholder="Search">
+            <input type="text" name="doc_id" value="{{file.document_id}}" hidden>
+            <input type="submit" hidden>
+        </form>
+    </div>
+
+    <div class="container">
+        <div class="contain-file">
+            <p id="file">
+    {{text}}
+            </p>
+        </div>
+
+        <div class="match_container">
+            {% if matches %}
+                <button class="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
+                {% for match in matches %}
+                <div class="matches" data-start="1" data-end="3"> <span class="close_match">x</span> 
+                    <label class="match_result"> {{match}} </label>
+                    <textarea class="notes" row="10" col="50">Note: </textarea>
+                </div>
+                {% endfor %}
+                <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
+            {% endif %}
+            
+            {% if not matches %}
+            No match results found.
+            {% endif %}
+        </div>
+
+    </div>
 </div>
 <script>
 
