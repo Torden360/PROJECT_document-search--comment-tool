@@ -46,6 +46,7 @@ def store_search(search_phrase, document_id):
 
 
 def create_group(search_id, user_id):
+    """ Create new group and store group info """
 
     group = Group(search_id=search_id,
                   user_id=user_id)
@@ -57,6 +58,7 @@ def create_group(search_id, user_id):
 
 
 def store_match(search_id, start_offset, end_offset, match_content):
+    """ Store saved match info """
 
     match = Search_Match(search_id=search_id,
                   start_offset=start_offset,
@@ -70,6 +72,7 @@ def store_match(search_id, start_offset, end_offset, match_content):
 
 
 def store_notes(note_content, match_id, group_id):
+    """ Store grouped notes per match """
 
     note = Note(note_content=note_content,
                 match_id=match_id,
