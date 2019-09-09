@@ -8,7 +8,7 @@ from model import (User, Document, Search, Search_Match, connect_to_db, db)
 
 from werkzeug.utils import secure_filename
 
-from sqlalchemy import func, distinct
+from sqlalchemy import func, distinct, update
 
 from db_functions import load_text, store_search, create_user, create_group, store_match, store_notes
 
@@ -25,10 +25,16 @@ app.secret_key = "ABC"
 def display_user_homepage():
     """ Displays user homepage """
 
-    file = Document.query.get(1)
-    # TODO: hardcoded until put if statement in template
+    user_id = session.get('did')
+    user = User.query.get(user_id)
 
-    return render_template('user_homepage.html', file=file)
+    if user.is_doc_owner:
+        return redirect('/owner_home')
+    else:
+        doc_id = session.get('did')
+        file = Document.query.get(doc_id)
+
+        return render_template('user_homepage.html', file=file)
 
 
 @app.route('/user_groups')
@@ -104,25 +110,30 @@ def display_document_owner_homepage():
 
     else:
 
-        file = Document.query.get(1)
+        user_id = session.get('user_id')
+        user = User.query.get(user_id)
+        username = user.username
+        file_objs = Document.query.filter(Document.doc_owner==username).all()
+        files = []
+        for file in file_objs:
+            files.append((file, bytes.decode(file.text)))
+            
+        # file = Document.query.get(doc_id)
         # TODO: hardcoded for now
 
-        text = bytes.decode(file.text)
+        # text = bytes.decode(file.text)
         # decodes byte string
 
-        return render_template("owner_homepage.html", file=file, text=text)
+        return render_template("owner_homepage.html", files=files)
+        #, text=text)
 
 
-@app.route('/stats_view', methods=['POST'])
+@app.route('/stats_view')
 def display_doc_stats():
     """ Displays document statistics for document owner """
 
-    # ask how to make the fetch a get request instead of post
-    req = request.get_json()
-
-    print(req, 'this is req in stats_view')
-    file = Document.query.get(int(req))
-    # TODO: hardcoded for now
+    doc_id = request.args.get('did')
+    file = Document.query.get(doc_id)
 
     searches = file.searches
     search_phrase_set = set()
