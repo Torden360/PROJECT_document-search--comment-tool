@@ -22,9 +22,10 @@
             let saveButton = document.createElement('button');
             saveButton.setAttribute('class', 'save_matches_button');
             saveButton.setAttribute('data-search-id', 'search_id');
-            saveButton.setAttribute('id', 'save_matches_button');
+            // saveButton.setAttribute('id', 'save_matches_button');
             // TODO: make this search_id dynamic
             saveButton.innerText = "Save";
+            saveButton.addEventListener('click', saveMatchData);
         
             let searchPhrase = tuple[0];
             let matchesList = tuple[1];
@@ -39,66 +40,57 @@
 
             matchesList.forEach((element) => {
                 let matchDiv = document.createElement('div');
+                let match = element[0];
                 matchDiv.setAttribute('class', 'match_result matches');
-                let matchContent = element[0];
+                matchDiv.setAttribute('data-match-id', match[1]);
+                console.log(match, 'match content!#$');
                 let note = element[1];
                 let noteTextarea = null;
 
-                matchDiv.innerText = matchContent;
+                matchDiv.innerText = match[0];
                 insertedGroupDiv.append(matchDiv);
 
                 if (note != null) {
                     noteTextarea = document.createElement('textarea');
                     noteTextarea.setAttribute('class', 'note');
-                    noteTextarea.innerText = note;
+                    noteTextarea.setAttribute('data-note-id', note[1]);
+                    noteTextarea.innerText = note[0];
                     insertedGroupDiv.append(noteTextarea);
                 }
             });
 
             insertedGroupDiv.append(saveButton);
-            
-            // console.log(tuple);
-
-            const groupSaveBtn = document.getElementsByClassName('save_matches_button');
-            console.log(groupSaveBtn, 'groupSaveButtons !!!')   
-            // add onclick listener
-            for (let i = 0; i < groupSaveBtn.length; i++) {
-                groupSaveBtn[i].addEventListener('click', saveMatchData);
-                console.log('this parent: ', groupSaveBtn[i].parentNode);
-                console.log('success for each groupSaveBtn!!!! ')
-            };
 
             return insertedGroupDiv;
         }
 
 
         function getGroupDict() {
-        let groupDiv = document.querySelector('.groups');
+            let groupDiv = document.querySelector('.groups');
 
-        fetch('/user_groups')
-        .then(response => response.json())
-        .then(data => {
-        // Here's a list of repos!
-            data.forEach((tuple, index) => {
-                console.log('tuple + index', tuple, index);
-                let insertedGroupDiv = createDiv(tuple);
-                console.log('')
-                groupDiv.appendChild(insertedGroupDiv);
+            fetch('/user_groups')
+            .then(response => response.json())
+            .then(data => {
+            // Here's a list of repos!
+                data.forEach((tuple, index) => {
+                    console.log('tuple + index', tuple, index);
+                    let insertedGroupDiv = createDiv(tuple);
+                    groupDiv.appendChild(insertedGroupDiv);
+                });
             });
-        });
         }
         
         window.onload = getGroupDict
 
-        const closeMatch  = document.querySelectorAll('.close_match');
+        // const closeMatch  = document.querySelectorAll('.close_match');
             
-        // closes match on click x
-        for (let i = 0; i < closeMatch.length; i++) {
-            closeMatch[i].addEventListener('click', function() {
-                this.parentElement.style.display = 'none';
-                this.parentElement.removeAttribute('class');
-            });
-        }
+        // // closes match on click x
+        // for (let i = 0; i < closeMatch.length; i++) {
+        //     closeMatch[i].addEventListener('click', function() {
+        //         this.parentElement.style.display = 'none';
+        //         this.parentElement.removeAttribute('class');
+        //     });
+        // }
             
         // would have to be on the containing div, but if still saving even when view closes, can try:
         // Element.removeAttribute('class')
@@ -112,9 +104,21 @@
             groupSaveBtn = evt.target
             console.log('this parent: ', groupSaveBtn.parentNode);
             // look for the parent container of the save button and then look for matches within it
-            group = groupSaveBtn.parentNode
+            group = groupSaveBtn.parentNode;
 
-            console.log('chillins: ', group.children)
+            // console.log('chillins: ', group.children)
+
+            children = group.children;
+
+            for(let i = 0; i < children.length; i++) {
+                console.log(children[i], 'this is child');
+                if (children[i].getAttribute('class') == "match_result") {
+                    let match_id = children[i].getAttribute('data-match-id');
+                    console.log('this is match_id i imagine it would be a list if there are multiple', match_id);
+                }
+            };
+
+            console.log('chillin at 0 should be search ', children[0]);
             
             console.log('This is saveMatchData!')
             
