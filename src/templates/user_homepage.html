@@ -3,8 +3,13 @@
 {% block title %} User Homepage {% endblock %}
 
 {% block bodycontent %}
+<header>
     <h1> User Homepage </h1>
     <h3> Viewing saves for document: {{file.name}} </h3>
+    <navbar class="over-background">
+        <a href="/file_view">Back to Document</a>
+    </navbar>
+</header>
 
     <script>
         function createDiv(tuple) {
@@ -54,6 +59,15 @@
             
             // console.log(tuple);
 
+            const groupSaveBtn = document.getElementsByClassName('save_matches_button');
+            console.log(groupSaveBtn, 'groupSaveButtons !!!')   
+            // add onclick listener
+            for (let i = 0; i < groupSaveBtn.length; i++) {
+                groupSaveBtn[i].addEventListener('click', saveMatchData);
+                console.log('this parent: ', groupSaveBtn[i].parentNode);
+                console.log('success for each groupSaveBtn!!!! ')
+            };
+
             return insertedGroupDiv;
         }
 
@@ -71,16 +85,6 @@
                 console.log('')
                 groupDiv.appendChild(insertedGroupDiv);
             });
-
-            const groupSaveBtn = document.querySelectorAll('.save_matches_button');
-            console.log(groupSaveBtn, 'groupSaveButtons !!!')   
-            // add onclick listener
-            for (let i = 0; i < groupSaveBtn.length; i++) {
-                groupSaveBtn[i].addEventListener('click', saveMatchData);
-            };
-
-
-
         });
         }
         
@@ -104,7 +108,13 @@
     
         // select save button
         
-        function saveMatchData() {
+        function saveMatchData(evt) {
+            groupSaveBtn = evt.target
+            console.log('this parent: ', groupSaveBtn.parentNode);
+            // look for the parent container of the save button and then look for matches within it
+            group = groupSaveBtn.parentNode
+
+            console.log('chillins: ', group.children)
             
             console.log('This is saveMatchData!')
             
@@ -112,13 +122,17 @@
             
             // select matches that have not been x'd out 
             // can now index into this array of objects
-            const matches = document.querySelectorAll('.match_result matches');
+            const matches = document.querySelector('.match_result');
+
+            console.log('what matches m i gettin? ', matches);
             
             // get search_id and put into dictionary
             // matchData['search_id'] = groupSaveBtn.getAttribute('data-search-id');
             // don't need this anymore
     
             matchData['matches'] = [];
+
+            console.log('matchData: ', matchData['matches']);
             
             for (let i = 0; i < matches.length; i++) {
                 console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
