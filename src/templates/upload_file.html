@@ -3,7 +3,8 @@
 {% block title %} Upload A Text File {% endblock %}
 
 {% block bodycontent %}
-<form action="/file_view" enctype="multipart/form-data" method="post">
+<video class="video" height="100%" width="100%" padding="0px" autoplay="" muted="" loop="" src="https://storage.coverr.co/videos/it-was-all-yellow?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjExNDMyN0NEOTRCMUFCMTFERTE3IiwiaWF0IjoxNTY3OTMwNTQwfQ.V-wLkleKuxA2DlzYyayKhmYslAzATpWMT1SC4rVsHhU" poster="https://storage.coverr.co/posters/it-was-all-yellow"></video>
+<form class="over-video" action="/file_view" enctype="multipart/form-data" method="post">
     <!-- I believe the enctype allows for a file to be uploaded, again not positive I need it -->
     <input type="text" name="documentowner" placeholder="Enter Your Name">
     <input type="file" name="file" accept=".txt">
