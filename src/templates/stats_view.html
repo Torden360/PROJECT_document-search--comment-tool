@@ -3,15 +3,20 @@
 {% block title %}Stats for: {{file.name}}{% endblock %}
 
 {% block bodycontent %}
+<header>
+    <h1>Viewing Statistics For File: {{file.name}}</h1>
+    <navbar class="over-background">
+        <a href="/owner_home">Back to Documents</a>
+    </navbar>
+</header>
 
-<h1>Viewing Statistics For File: {{file.name}}</h1>
-<div class="stat_card">
+<div class="stat_card"><a href="/stats_view">
 {% for search in search_tuples %}
     <div class="stat">
         <h3>{{search[0]}}</h3>
         <p>Count: {{search[1]}}</p>
     </div>
 {% endfor %}
-</div>
+</a></div>
 
 {% endblock %}
