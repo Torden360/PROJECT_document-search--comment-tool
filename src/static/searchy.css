@@ -1,3 +1,7 @@
+a {
+    color: white;
+}
+
 #file {
     white-space: pre-wrap;
     margin: 10px;
@@ -53,6 +57,11 @@
     border-style: solid;
 }
 
+.contain-file {
+    background-color:#f1f1f1;
+    margin: 10px;
+}
+
 .match_container {
     display: flex;
     padding: 20px;
@@ -95,6 +104,11 @@
 }
 
 .close_match:hover {background: #bbb;}
+
+.card-label {
+    opacity: unset;
+    filter: unset;
+}
 
 .card {
     display: flex;
@@ -139,3 +153,44 @@
     justify-content: space-around;
     background-color: #cabdda;
 }
+
+.video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%; 
+    min-height: 100%;
+    object-fit: cover;
+}
+
+.over-video {
+    position: fixed;
+    top: 20%;
+    /* background: rgba(0, 0, 0, 0.5); */
+    color: #f1f1f1;
+    width: 100%;
+    padding: 20px;
+}
+
+html {
+    /* position: fixed;
+    right: 0;
+    bottom: 0; */
+    /* background-image: url('https://www.toptal.com/designers/subtlepatterns/patterns/morocco-blue.png'); */
+    /* background: url("https://www.toptal.com/designers/subtlepatterns/patterns/morocco.png"); ligter, ligtest \/*/
+    background: url("https://www.toptal.com/designers/subtlepatterns/patterns/contemporary_china.png");
+    /* min-width: 100%;
+    min-height: 100%;
+    object-fit: cover; */
+}
+/* using html for now to have this background img */
+
+.over-background {
+    top: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: #f1f1f1;
+    width: 100%;
+    padding: 20px;
+    position: sticky;
+}
+
