@@ -3,40 +3,38 @@
 {% block title %}Doc Owner Homepage{% endblock %}
 
 {% block bodycontent %}
-<h1>Document Owner Homepage </h1>
+<header>
+    <h1>Document Owner Homepage </h1>
+    <navbar class="over-background">
+        <a href="/file_view">Back to Document</a>
+    </navbar>
+</header>
 
-<div class="card" data-id="{{file.document_id}}">
+{% for file in files %}
+<div class="card" data-id="{{file[0].document_id}}">
     <div class="card_container">
+        <label class="card-label over-background">     
+            {{file[0].name}}
+            By {{file[0].doc_owner}}
+        </label>
         <div id="file">
-    {{text}}
+            {{file[1]}}
         </div>
     </div>
 </div>
+{% endfor %}
 <script>
     const card = document.querySelectorAll('.card');
     console.log('card: ', card);
 
     for(let i = 0; i < card.length; i++) {
-        card[i].addEventListener('click', function() {
+        card[i].addEventListener('click', function(evt) {
             document_id = this.getAttribute('data-id');
-
-            fetch('/owner_home', {
-                method: 'POST',
-                // redirect: 'follow',
-                body: JSON.stringify(document_id),
-                headers: new Headers({
-                    "content-type": "application/json"
-                })
-            })
-            // .then(response => response.json())
-            // .then(response => console.log('Success:', JSON.stringify(response)))
-            .catch(error => console.error('Error:', error));
+            console.log(evt.target, 'element')
+            console.log('document_id', document_id);
+            window.location.replace('/stats_view?did=' + document_id);
         })
     };
-
-    // function goToStatView() {
-    // }
-
 </script>
 <!-- <script>
 
