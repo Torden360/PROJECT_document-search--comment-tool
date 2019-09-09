@@ -3,18 +3,18 @@ from jinja2 import StrictUndefined
 from flask import (Flask, render_template, redirect, request, jsonify, make_response, flash, session)
 from flask_debugtoolbar import DebugToolbarExtension
 
-from model import (User, Document, Search, Search_Match, connect_to_db, db) 
-# will add Group, Group_Match, and Comment after MVP
-
-from werkzeug.utils import secure_filename
+from model import (User, Document, Search, Search_Match, Group, Note, connect_to_db, db) 
+from db_functions import load_text, store_search, create_user, create_group, store_match, store_notes
 
 from sqlalchemy import func, distinct, update
 
-from db_functions import load_text, store_search, create_user, create_group, store_match, store_notes
+from werkzeug.utils import secure_filename
 
 from search import search
+# imports regex function search
 
 import random
+
 
 app = Flask(__name__)
 
@@ -25,12 +25,16 @@ app.secret_key = "ABC"
 def display_user_homepage():
     """ Displays user homepage """
 
-    user_id = session.get('did')
+    user_id = session.get('user_id')
     user = User.query.get(user_id)
 
     if user.is_doc_owner:
+    # if the user stored in the session is the doc_owner, then redirect to doc_owner homepage
         return redirect('/owner_home')
+
     else:
+    # if the user is simply a contributor, redirect to user_homepage
+    # need to shift some things around to accomodate for if user also owns a document but not this one
         doc_id = session.get('did')
         file = Document.query.get(doc_id)
 
@@ -39,7 +43,7 @@ def display_user_homepage():
 
 @app.route('/user_groups')
 def display_groups():
-    """ Displays user's groups """
+    """ Displays user's groups on window load """
 
     doc_id = session.get('did')
     user_id = session.get('user_id')
@@ -49,83 +53,95 @@ def display_groups():
     searches = file.searches
 
     groups = []
+    # create groups list
 
     for user_search in searches:
         group = user_search.groups
+        # get the group associated with the current search in the loop
+
         search_tuples = []
+        # create search data list
 
         if group:
-
-            # need to make this conditional on user
+        # if group, also need to make this conditional on user
 
             search_phrase = user_search.search_phrase
             search_tuples.append(search_phrase)
+            # append search_phrase
 
             matches = user_search.search_matches
             matches_list = []
+            # create matches list
+
             search_tuples.append(matches_list)
+            # append matches list to search data list
 
             for match in matches:
-                match_content = match.match_content
-                notes = match.notes
-                content = []
+                match_data = (match.match_content, match.match_id)
+                # create a tuple for each match containing the match_content and match_id)
 
-                content.append(match_content)
+                notes = match.notes
+                # creates a list of match notes
+
+                content = []
+                # create a content list
+
+                content.append(match_data)
+                # add match_data tuple to content list
 
                 if notes:
-                    note = notes[0].note_content
+                    note = (notes[0].note_content, notes[0].note_id)
+                    # only be one note per match, but need to index because is a list
+                    # create a tuple containing note_content and note_id
+
                     content.append(note)
+                    # add note tuple to content list
 
                 content = tuple(content)
-                matches_list.append(content)
-            print('this is content: ', content)
-            print('')
+                # make content list a tuple
 
-            search_tuples.append(matches_list)
+                matches_list.append(content)
+                # add content tuple to list of matches
+
+            # search_tuples.append(matches_list)
+            # add list of match content tuples to search data list
+            # I believe I did this earlier, and this line is redundant
+
             search_tuples = tuple(search_tuples)
+            # make search data list into a tuple
 
             groups.append(search_tuples)
+            # add search data tuple of tuples of list of tuples into groups list
 
         else:
             flash('You have no saved groups')
-
-    print('')
-    print('this is the groups list: ', groups)
+            # this isn't working
 
     groups = jsonify(groups)
 
     return groups
 
 
-@app.route('/owner_home', methods=['GET', 'POST'])
+@app.route('/owner_home')
 def display_document_owner_homepage():
-    """ Displays the document of user's choice """
+    """ Displays the document of owner's choice """
 
-    if request.method == 'POST':
-        req = request.get_json()
-        print('were in req: ', req)
-        # res = make_response(jsonify(req), 200)
+    user_id = session.get('user_id')
+    user = User.query.get(user_id)
+    username = user.username
+    # get the user's stored username
 
-        return redirect('/stats_view', req)
+    file_objs = Document.query.filter(Document.doc_owner==username).all()
+    # get all of the document objects stored under the given username
 
-    else:
+    files = []
+    # create files list
 
-        user_id = session.get('user_id')
-        user = User.query.get(user_id)
-        username = user.username
-        file_objs = Document.query.filter(Document.doc_owner==username).all()
-        files = []
-        for file in file_objs:
-            files.append((file, bytes.decode(file.text)))
-            
-        # file = Document.query.get(doc_id)
-        # TODO: hardcoded for now
+    for file in file_objs:
+        files.append((file, bytes.decode(file.text)))
+        # add tuple of file object and decoded file text to files list
 
-        # text = bytes.decode(file.text)
-        # decodes byte string
-
-        return render_template("owner_homepage.html", files=files)
-        #, text=text)
+    return render_template("owner_homepage.html", files=files)
 
 
 @app.route('/stats_view')
@@ -136,25 +152,38 @@ def display_doc_stats():
     file = Document.query.get(doc_id)
 
     searches = file.searches
+    # get all searches for selected file
+
     search_phrase_set = set()
+    # create a set for search phrases
+
     search_tuples = []
+    # create a set for search data
 
     for search_obj in searches:
         search_phrase_set.add(search_obj.search_phrase)
+        # add the search phrase for each search into the created set to remove duplicates
     
     for search_phrase in search_phrase_set:
         searches_w_phrase = Search.query.filter(Search.search_phrase==search_phrase).all()
-        count = len(searches_w_phrase)
-        search_tuple = (search_phrase, count)
-        search_tuples.append(search_tuple)
+        # for each phrase in the set, find all unique searches with that phrase
 
-    def Sort_Tuple(tup):  
-   
-        return(sorted(tup, key = lambda x: x[1], reverse=True))   
+        count = len(searches_w_phrase)
+        # find the length of the generated searches of search phrase list
+
+        search_tuple = (search_phrase, count)
+        # create a tuple containing the search phrase and its count 
+
+        search_tuples.append(search_tuple)
+        # add the individual search tuples to the search data list
+
+    def Sort_Tuple(tup):
+        """ Display search with largest count first """
+        return(sorted(tup, key = lambda x: x[1], reverse=True)) 
+        # sorts the data in the list of tuples according to second param/search count of each tuple
 
     search_tuples = Sort_Tuple(search_tuples)
-
-    print('sorted : ', search_tuples)
+    # call the sort function on the search tuples
     
     return render_template('stats_view.html', file=file, search_tuples=search_tuples)
 
@@ -171,6 +200,7 @@ def display_document():
     """ Displays the document of user's choice """
 
     if request.method == 'POST':
+    # upload_file uses post method to display this route, should not need post method otherwise
 
         file = request.files['file']
         # retrieves the uploaded file
@@ -182,15 +212,18 @@ def display_document():
         start_number = random.randint(14,99)
 
         passcode = str(start_number) + secure_filename(filename[0:2]) + str(end_number)
+        # create a passcode for the document
 
         doc_owner = request.form.get('documentowner')
 
         file = load_text(file, filename, passcode, doc_owner)
-        # call load_text FN with the file and filename
+        # call load_text FN with the file and filename, add passcode and doc_owner
 
         user = create_user(doc_owner, file.document_id, True)
+        # create a new user and set is_doc_owner to True
 
         session['user_id'] = user.user_id
+        # store the user the session
 
         text = bytes.decode(file.text)
         # decodes byte string
@@ -198,7 +231,9 @@ def display_document():
         return render_template("file_view.html", file=file, text=text, passcode=passcode)
     
     if session.get('passcode'):
-    # if session has passcode, 
+    # if session has passcode already stored
+    # for users navigating to this view via link
+    # not the most secure, will look into local storage to store this in the future
 
         doc_id = session.get('did')
 
@@ -209,21 +244,18 @@ def display_document():
         text = bytes.decode(file.text)
         # decodes byte string
 
-        # need to store session
-
         return render_template("file_view.html", file=file, text=text)
 
     else:
+    # for users attempting to view document via given url and passcode
 
         doc_id = request.args.get('did')
 
         session["did"] = doc_id
+        # store document user is trying to access in session to pass to /authenticate route
 
         return redirect('/authenticate')
 
-
-
-# developping this in the most basic/redundant way for now
 
 @app.route('/search_view')
 def search_document():
@@ -235,40 +267,30 @@ def search_document():
     document_id = request.args.get('doc_id')
 
     search_id = store_search(search_phrase, document_id)
+    # calls FN to store search
 
     file = Document.query.get(document_id)
     text = bytes.decode(file.text)
 
     matches = search(search_phrase, text)
+    # calls FN to regex over given phrase and decoded text
+    # could decode within the search FN, looking into encrypting this document in the future
 
     return render_template("file_view.html", file=file, text=text, 
         search_phrase=search_phrase, search_id=search_id, matches=matches)
 
 
-# not working right now
-# @app.route('/enter_passcode')
-# def asks_user_to_enter_passcode():
-#     """ Asks user to enter passcode to view document """
-
-#     if Document.password == user_input:
-#         # redirect("/file_view")
-
-#     else:
-#         flash("Please enter the correct password")
-
-
-# This route is incomplete
 @app.route('/save_grouped_matches', methods=['POST'])
 def save_matches():
     """ Saves the matches and notes in a group """
 
     req = request.get_json()
 
-    print('This is json from front end!!', req)
-
     user_id = session.get('user_id')
     search_id = req['search_id']
+
     group_id = create_group(search_id, user_id)
+    # calls FN to create group using data received
 
     for match in req['matches']:
 
@@ -295,6 +317,8 @@ def update_matches():
     """ Updates the matches and notes in a group """
 
     req = request.get_json()
+
+    # for now, let's just update the note content according to match_id
 
     print('This is json from front end!!', req)
 
@@ -356,8 +380,7 @@ def authenticate_passcode():
     session["passcode"] = file.passcode
 
     flash("You are welcome to view")
-    return redirect(f"/file_view")
-    # this part is unnecessary with the session storing did {did=doc_id}{user.user_id}/")
+    return redirect("/file_view")
 
 
 if __name__ == "__main__":
