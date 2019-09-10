@@ -46,10 +46,17 @@ a {
     justify-content: space-evenly;
 }
 
+.stat_groups {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
 .perSearch {
     display: flex;
     border-style: solid;
     justify-content: center;
+    width: 325%;
 }
 
 .container {
@@ -152,6 +159,7 @@ a {
     flex-direction: column;
     justify-content: space-around;
     background-color: #cabdda;
+    width: 18%;
 }
 
 .video {
