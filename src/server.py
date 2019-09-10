@@ -7,6 +7,7 @@ from model import (User, Document, Search, Search_Match, Group, Note, connect_to
 from db_functions import load_text, store_search, create_user, create_group, store_match, store_notes
 
 from sqlalchemy import func, distinct, update
+# I don't know yet if I'll use these
 
 from werkzeug.utils import secure_filename
 
@@ -62,8 +63,8 @@ def display_groups():
         search_tuples = []
         # create search data list
 
-        if group:
-        # if group, also need to make this conditional on user
+        if group and group[0].user_id == user_id:
+        # if group, if group belongs to current user
 
             search_phrase = user_search.search_phrase
             search_tuples.append(search_phrase)
@@ -113,9 +114,9 @@ def display_groups():
             groups.append(search_tuples)
             # add search data tuple of tuples of list of tuples into groups list
 
-        else:
-            flash('You have no saved groups')
-            # this isn't working
+    if not Group.query.filter_by(user_id=user_id).all():
+        flash('You have no saved groups')
+        # TODO: this isn't working, check if this is working for new user with no groups
 
     groups = jsonify(groups)
 
@@ -188,6 +189,97 @@ def display_doc_stats():
     return render_template('stats_view.html', file=file, search_tuples=search_tuples)
 
 
+# --------------------------- UNDER CONSTRUCTION ----------------------------
+
+@app.route('/search_data', methods=['POST'])
+def display_search_data():
+    """ Displays search groups and data on click for document owner """
+
+    req = request.get_json()
+
+    search_phrase = req
+
+    doc_id = request.args.get('did')
+    # user_id = session.get('user_id')
+    # Will only be using this later when add more authentication
+
+    file = Document.query.get(doc_id)
+
+    searches = file.searches
+
+    groups = []
+    # create groups list
+
+    for user_search in searches:
+        if user_search.search_phrase == search_phrase:
+            group = user_search.groups
+            # get the group associated with the current search in the loop
+
+            search_tuples = []
+            # create search data list
+
+            if group:
+            # if group, if group belongs to current user
+
+                search_phrase = user_search.search_phrase
+                search_tuples.append(search_phrase)
+                # append search_phrase
+
+                matches = user_search.search_matches
+                matches_list = []
+                # create matches list
+
+                search_tuples.append(matches_list)
+                # append matches list to search data list
+
+                for match in matches:
+                    match_data = (match.match_content, match.match_id)
+                    # create a tuple for each match containing the match_content and match_id)
+
+                    notes = match.notes
+                    # creates a list of match notes
+
+                    content = []
+                    # create a content list
+
+                    content.append(match_data)
+                    # add match_data tuple to content list
+
+                    if notes:
+                        note = (notes[0].note_content, notes[0].note_id)
+                        # only be one note per match, but need to index because is a list
+                        # create a tuple containing note_content and note_id
+
+                        content.append(note)
+                        # add note tuple to content list
+
+                    content = tuple(content)
+                    # make content list a tuple
+
+                    matches_list.append(content)
+                    # add content tuple to list of matches
+
+                # search_tuples.append(matches_list)
+                # add list of match content tuples to search data list
+                # I believe I did this earlier, and this line is redundant
+
+                search_tuples = tuple(search_tuples)
+                # make search data list into a tuple
+
+                groups.append(search_tuples)
+                # add search data tuple of tuples of list of tuples into groups list
+
+    # if not groups:
+    #     flash('There are no saved groups')
+        # this conditional should be set on front end
+
+    groups = jsonify(groups)
+
+    return groups
+
+    # ------------------------------------------------------------------------
+
+
 @app.route('/upload_file')
 def upload_document():
     """ Allows user to upload a document """
@@ -237,7 +329,8 @@ def display_document():
 
         doc_id = session.get('did')
 
-        user_id = session.get('user_id')
+        # user_id = session.get('user_id')
+        # TODO: I'm not using this, so I don't think I need it here
 
         file = Document.query.get(doc_id)
 
@@ -285,12 +378,13 @@ def save_matches():
     """ Saves the matches and notes in a group """
 
     req = request.get_json()
+    # receive json data
 
     user_id = session.get('user_id')
     search_id = req['search_id']
 
     group_id = create_group(search_id, user_id)
-    # calls FN to create group using data received
+    # call FN to create group using data received
 
     for match in req['matches']:
 
@@ -299,19 +393,24 @@ def save_matches():
         match_content = match['match_content']
 
         match_id = store_match(search_id, start_offset, end_offset, match_content)
+        # call FN to store each saved match result
 
         if match['notes']:
             note_content = match['notes']
             store_notes(note_content, match_id, group_id)
+            # call FN to store saved notes per match
 
     # TODO: this flash message is currently not working, just mocked out for now
-    flash('Your search matches and notes have been saved')
+    flash('Your search matches and notes have been saved', 'info')
     
-    res = make_response(jsonify(req), 200)
+    res = make_response(jsonify("Success: True"), 200)
+    # send success response to fetch
 
     return res
 
 
+# -------------------------- UNDER CONSTRUCTION --------------------------
+# route not working yet
 @app.route('/update_grouped_matches', methods=['POST'])
 def update_matches():
     """ Updates the matches and notes in a group """
@@ -344,19 +443,20 @@ def update_matches():
     res = make_response(jsonify(req), 200)
 
     return res
+# -------------------------------------------------------------------------
 
 
 @app.route('/authenticate')
 def get_passcode():
+    """ Renders passcode authentication template upon redirect with static url """
 
     return render_template('enter_passcode.html')
 
 
 @app.route('/authenticate', methods=['POST'])
 def authenticate_passcode():
-    """Process passcode."""
+    """ Processes the given passcode."""
 
-    # Get form variables
     username = request.form["username"]
     passcode = request.form["passcode"]
 
@@ -365,21 +465,28 @@ def authenticate_passcode():
     file = Document.query.get(doc_id)
 
     if file.passcode != passcode:
+    # check if passcode given is the stored passcode for the requested document
+
         flash("Passcode is incorrect")
         return redirect("/authenticate")
 
-    newuser = request.form['newuser']
+    newuser = request.form.get('newuser')
+    # has the user checked the newuser box?
 
     if newuser:
         user = create_user(username, doc_id)
+        # call FN to create new user
         
     else:
-        user = User.query.filer_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
+        # if not a new user, get the user object stored
+        # does not account for repeat name entries yet
 
     session["user_id"] = user.user_id
     session["passcode"] = file.passcode
+    # store the session data
 
-    flash("You are welcome to view")
+    flash(f'Welcome, {username}')
     return redirect("/file_view")
 
 
