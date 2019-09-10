@@ -10,13 +10,116 @@
     </navbar>
 </header>
 
-<div class="stat_card"><a href="/stats_view">
+<div class="stat_card">
 {% for search in search_tuples %}
     <div class="stat">
-        <h3>{{search[0]}}</h3>
-        <p>Count: {{search[1]}}</p>
+        <button class="searchClickBtn" style="border-style: none; background-color: #cabdda;">
+            <h3>{{search[0]}}</h3>
+            <p>Count: {{search[1]}}</p>
+        </button>
+        <div class="stat_groups">
+        </div>
     </div>
 {% endfor %}
-</a></div>
+</div>
+<script type="text/javascript">
+    function createDiv(tuple) {
+        // console.log('clickSearch', clickSearch[i]);
+        // Is there a way to pass in the click search node's information? there must be
+
+        let insertedGroupDiv = document.createElement('div');
+        let searchPhraseDiv = document.createElement('h2');
+
+        insertedGroupDiv.setAttribute('class', 'group');
+        searchPhraseDiv.setAttribute('class', 'perSearch');
+
+        // TODO: make this search_id dynamic
+    
+        let searchPhrase = tuple[0];
+        let matchesList = tuple[1];
+
+        // console.log(matchesList);
+
+        searchPhraseDiv.innerText = searchPhrase;
+        insertedGroupDiv.append(searchPhraseDiv);
+
+        // console.log(typeof matchesList);
+        // console.log(matchesList.length);
+
+        matchesList.forEach((element) => {
+            let matchDiv = document.createElement('div');
+            let match = element[0];
+            matchDiv.setAttribute('class', 'match_result matches');
+            matchDiv.setAttribute('data-match-id', match[1]);
+            console.log(match, 'match content!#$');
+            let note = element[1];
+            let noteTextarea = null;
+
+            matchDiv.innerText = match[0];
+            insertedGroupDiv.append(matchDiv);
+
+            if (note !== null) {
+                noteTextarea = document.createElement('textarea');
+                noteTextarea.setAttribute('class', 'note');
+                noteTextarea.setAttribute('data-note-id', note[1]);
+                noteTextarea.innerText = note[0];
+                insertedGroupDiv.append(noteTextarea);
+            }
+        });
+
+        return insertedGroupDiv;
+    }
+
+    //  -------------------------------- IAM HERE --------------------------
+    // trying to pass in the correct item that has been clicked so that I can
+    // get info from it's parent's other child nodes I just want to be able to
+    // tell what the search is
+    function getGroupDict(evt) {
+        // maybe i can do if the event bubbles, get it's parent node, else get node?
+        searchClicked = evt.target;
+        console.log('searchClicked!', searchClicked);
+
+        let groupDiv = searchClicked.children[2];
+        //document.querySelector('.stat_groups');
+        console.log('groupDiv', groupDiv);
+        let matchResult = document.querySelectorAll('.match_result');
+
+        if (matchResult.length !== 0) {
+            let toRemove = groupDiv.childNodes;
+            console.log('to remove', toRemove);
+    
+            while (toRemove.length > 0) {
+                toRemove[0].remove('div');
+            }
+        }
+
+
+        // function clickedSearch() {
+            
+        // }
+
+        fetch('/search_data', {
+            method: 'POST',
+            body: JSON.stringify(clickedSearch),
+            headers: new Headers({
+                "content-type": "application/json"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            data.forEach((tuple, index) => {
+                console.log('tuple + index', tuple, index);
+                let insertedGroupDiv = createDiv(tuple);
+                groupDiv.appendChild(insertedGroupDiv);
+            });
+        });
+    }
+
+    const clickSearch = document.querySelectorAll('.searchClickBtn');
+
+    for (let i = 0; i < clickSearch.length; i++) {
+        clickSearch[i].addEventListener('click', getGroupDict);
+    }
+</script>
 
 {% endblock %}
