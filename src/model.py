@@ -18,7 +18,7 @@ class Document(db.Model):
     passcode = db.Column(db.String(60), nullable=False)
     # TODO: make passcode a passwordType
     doc_owner = db.Column(db.String(60), nullable=False)
-    # I would want to do this instead, but don't have time to build out the other functionalities it requires
+    # I would want to do this instead for more security, but don't have time to build out the other functionalities it requires
     # owner_id = db.Column(db.Integer, db.ForeignKey('document_users.user_id') nullable=False)
 
     def __repr__(self):
@@ -35,7 +35,6 @@ class User(db.Model):
     username = db.Column(db.String(60), nullable=False)
     document_id = db.Column(db.Integer, db.ForeignKey('documents.document_id'))
     is_doc_owner = db.Column(db.Boolean)
-    # may need to add nullable field boolean for doc_owner
 
     document = db.relationship('Document', backref='document_users')
     group = db.relationship('Group', backref='document_users')
