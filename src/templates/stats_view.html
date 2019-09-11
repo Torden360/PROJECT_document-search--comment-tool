@@ -12,11 +12,9 @@
 
 <div class="stat_card">
 {% for search in search_tuples %}
-    <div class="stat">
-        <button class="searchClickBtn" style="border-style: none; background-color: #cabdda;">
-            <h3>{{search[0]}}</h3>
-            <p>Count: {{search[1]}}</p>
-        </button>
+    <div class="stat" data-doc="{{file.document_id}}">
+        <h3>{{search[0]}}</h3>
+        <p>Count: {{search[1]}}</p>
         <div class="stat_groups">
         </div>
     </div>
@@ -74,14 +72,29 @@
     // trying to pass in the correct item that has been clicked so that I can
     // get info from it's parent's other child nodes I just want to be able to
     // tell what the search is
+    function clickedSearchFN(searchPhraseNode, did) {
+        return [searchPhraseNode.innerText, did];
+    }
+
     function getGroupDict(evt) {
         // maybe i can do if the event bubbles, get it's parent node, else get node?
-        searchClicked = evt.target;
-        console.log('searchClicked!', searchClicked);
+        
+        const searchClicked = evt.target;
+        let clickedSearch = null;
+        let groupDiv = null;
 
-        let groupDiv = searchClicked.children[2];
-        //document.querySelector('.stat_groups');
-        console.log('groupDiv', groupDiv);
+        if (searchClicked.children.length === 3) {
+            let did = searchClicked.getAttribute('data-doc');
+            groupDiv = searchClicked.children[2];
+            clickedSearch = clickedSearchFN(searchClicked.children[0], did);
+        }
+        else {
+            let parentDiv = searchClicked.parentNode;
+            let did = parentDiv.getAttribute('data-doc');
+            groupDiv = parentDiv.children[2];
+            clickedSearch = clickedSearchFN(parentDiv.children[0], did);
+        }
+        
         let matchResult = document.querySelectorAll('.match_result');
 
         if (matchResult.length !== 0) {
@@ -93,10 +106,7 @@
             }
         }
 
-
-        // function clickedSearch() {
-            
-        // }
+        console.log('should be search_phrase', JSON.stringify(clickedSearch));
 
         fetch('/search_data', {
             method: 'POST',
@@ -105,17 +115,27 @@
                 "content-type": "application/json"
             })
         })
-        .then(response => response.json())
+        // .then(response.resolve())// => console.log(response.json()))
+        // .then(response => console.log('Success sending data!', response))
         .then(data => {
-            data.forEach((tuple, index) => {
+            // console.log(data.json());
+            // console.log(data.resolve());
+            let dataJSON = data.json();
+            console.log('DJ', dataJSON);
+            // console.log(Object.keys(dataJSON[0]));
+            // console.log(dataJSON['PromiseValue']);
+            console.log(Object.values(dataJSON));
+            dataJSON.forEach((tuple, index) => {
+                console.log('hey');
                 console.log('tuple + index', tuple, index);
                 let insertedGroupDiv = createDiv(tuple);
                 groupDiv.appendChild(insertedGroupDiv);
             });
-        });
+        })
+        .catch(error => console.error('Error:', error));
     }
 
-    const clickSearch = document.querySelectorAll('.searchClickBtn');
+    const clickSearch = document.querySelectorAll('.stat');
 
     for (let i = 0; i < clickSearch.length; i++) {
         clickSearch[i].addEventListener('click', getGroupDict);
