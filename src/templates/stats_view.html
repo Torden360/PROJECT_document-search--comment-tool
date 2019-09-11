@@ -82,6 +82,7 @@
         const searchClicked = evt.target;
         let clickedSearch = null;
         let groupDiv = null;
+        console.log(searchClicked.closest());
 
         if (searchClicked.children.length === 3) {
             let did = searchClicked.getAttribute('data-doc');
@@ -94,19 +95,6 @@
             groupDiv = parentDiv.children[2];
             clickedSearch = clickedSearchFN(parentDiv.children[0], did);
         }
-        
-        let matchResult = document.querySelectorAll('.match_result');
-
-        if (matchResult.length !== 0) {
-            let toRemove = groupDiv.childNodes;
-            console.log('to remove', toRemove);
-    
-            while (toRemove.length > 0) {
-                toRemove[0].remove('div');
-            }
-        }
-
-        console.log('should be search_phrase', JSON.stringify(clickedSearch));
 
         fetch('/search_data', {
             method: 'POST',
@@ -115,19 +103,21 @@
                 "content-type": "application/json"
             })
         })
-        // .then(response.resolve())// => console.log(response.json()))
-        // .then(response => console.log('Success sending data!', response))
+        .then(response => response.json())
         .then(data => {
-            // console.log(data.json());
-            // console.log(data.resolve());
-            let dataJSON = data.json();
-            console.log('DJ', dataJSON);
-            // console.log(Object.keys(dataJSON[0]));
-            // console.log(dataJSON['PromiseValue']);
-            console.log(Object.values(dataJSON));
-            dataJSON.forEach((tuple, index) => {
-                console.log('hey');
-                console.log('tuple + index', tuple, index);
+            data.forEach((tuple, index) => {
+                let matchResult = document.querySelectorAll('.match_result');
+
+                // if (matchResult.length !== 0) {
+                //     console.log(groupDiv);
+                //     let toRemove = groupDiv.childNodes;
+                //     console.log(groupDiv.children);
+                //     console.log('to remove', toRemove);
+            
+                //     while (toRemove.length > 0) {
+                //         toRemove[0].remove('div');
+                //     }
+                // }
                 let insertedGroupDiv = createDiv(tuple);
                 groupDiv.appendChild(insertedGroupDiv);
             });
