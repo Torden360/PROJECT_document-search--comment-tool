@@ -197,13 +197,17 @@ def display_search_data():
 
     req = request.get_json()
 
-    search_phrase = req
+    print(req, 'req!@--------------------------------------------^^')
+    # search_phrase = "hey"
 
-    doc_id = request.args.get('did')
+    search_phrase, doc_id = req
+
+    print('-----------------------------^^^^^-----', type(doc_id))
     # user_id = session.get('user_id')
     # Will only be using this later when add more authentication
+    # doc_id = 1
 
-    file = Document.query.get(doc_id)
+    file = Document.query.get(int(doc_id))
 
     searches = file.searches
 
@@ -272,8 +276,12 @@ def display_search_data():
     # if not groups:
     #     flash('There are no saved groups')
         # this conditional should be set on front end
+    print('GRUUUUP BEFORE', groups)
 
-    groups = jsonify(groups)
+    groups = make_response(jsonify(groups))
+    print(groups, '^^^^^^^^^^~~~~~~~~~~~~~~~~~GROUUUUUP')
+
+    # resp = jsonify('this is a tuple', 1)
 
     return groups
 
@@ -390,7 +398,10 @@ def save_matches():
 
         start_offset = match['start_offset']
         end_offset = match['end_offset']
-        match_content = match['match_content']
+        match_content = match['match_content'][2:]
+        # this is to strip off the x for now, still testing
+        print('matchhhh', match_content)
+        # TODO: remove this print
 
         match_id = store_match(search_id, start_offset, end_offset, match_content)
         # call FN to store each saved match result
