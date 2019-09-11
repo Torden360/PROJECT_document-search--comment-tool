@@ -4,25 +4,36 @@
 
 {% block bodycontent %}
 <header>
-    <h1>Document Owner Homepage </h1>
+    <center class="page-header">Document Owner Homepage </center>
     <navbar class="over-background">
         <a href="/file_view">Back to Document</a>
     </navbar>
 </header>
 
+<div class="around-cards">
 {% for file in files %}
-<div class="card" data-id="{{file[0].document_id}}">
-    <div class="card_container">
-        <label class="card-label over-background">     
-            {{file[0].name}}
-            By {{file[0].doc_owner}}
-        </label>
-        <div id="file">
-            {{file[1]}}
+
+    <div class="card" data-id="{{file[0].document_id}}">
+        <!-- <div class="card_container"> -->
+        <div class="over-card">
+            <label class="card-label over-background">
+                {{file[0].name}}
+                By {{file[0].doc_owner}}
+                <img src="static/img/daan-stevens-hKp6UjK3yWg-unsplash.jpg" class="img-over-card">
+            </label>
+            
         </div>
+        <!-- stuff over img on hover should be nested one more  -->
+        <div class="under-card-img">
+            <div class="file">
+                {{file[1]}}
+            </div>
+        </div>
+        <!-- </div> -->
     </div>
-</div>
+
 {% endfor %}
+</div>
 <script>
     const card = document.querySelectorAll('.card');
     console.log('card: ', card);
@@ -36,89 +47,4 @@
         })
     };
 </script>
-<!-- <script>
-
-const closeMatch  = document.querySelectorAll('.close_match');
-
-// // closes match on click x
-for (let i = 0; i < closeMatch.length; i++) {
-    closeMatch[i].addEventListener('click', function() {
-        this.parentElement.style.display = 'none';
-        this.parentElement.removeAttribute('class');
-    });
-}
-
-// would have to be on the containing div, but if still saving even when view closes, can try:
-// Element.removeAttribute('class')
-// to remove the element from being grouped with the matches class query selector
-
-    // Alert group notes were saved
-
-    // select save button
-    const groupSaveBtn = document.getElementById('save_matches_button');
-    
-    function saveMatchData() {
-
-        console.log('This is saveMatchData!')
-
-        const matchData = {};
-
-        // select matches that have not been x'd out 
-        // can now index into this array of objects
-        const matches = document.querySelectorAll('.matches');
-
-        // get search_id and put into dictionary
-        matchData['search_id'] = groupSaveBtn.getAttribute('data-search-id');
-
-        matchData['matches'] = [];
-
-        for (let i = 0; i < matches.length; i++) {
-            console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
-                        matches[i].getAttribute("data-start"));
-
-            let notes = null;
-
-            // get match note value and determine if user has written notes
-            if (matches[i].children[2].value > matches[i].children[2].defaultValue) {
-                console.log('within the if statement!');
-                notes = matches[i].children[2].value;
-                console.log(notes);
-            }
-
-            console.log('this ish notess ', notes);
-
-            matchData['matches'].push({
-                // get content of match notes
-                'match_content': matches[i].innerText,
-
-                // get start_offset
-                'start_offset': matches[i].getAttribute('data-start'),
-            
-                // get end_offset of matches
-                'end_offset': matches[i].getAttribute('data-end'),
-
-                // set notes value
-                'notes': notes,
-            });
-        }
-
-        fetch('/stats_view', {
-            method: 'GET',
-            body: JSON.stringify(docData),
-            headers: new Headers({
-                "content-type": "application/json"
-            })
-        })
-        .then(response => response.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
-    }
-
-    // add onclick listener
-    groupSaveBtn.addEventListener('click', saveMatchData);
-
-</script> -->
-<!-- Am not using the script tag atm, but I think there are a lot of useful things in it 
-that I may be able to transition for this page -->
-
 {% endblock %}
