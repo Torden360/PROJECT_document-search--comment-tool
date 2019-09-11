@@ -34,11 +34,11 @@ def get_location(phrase):
 
 def get_context(phrase, document_text):
 
-    matches = re.findall(r'[^.?!]*[.?!(?:\s)]*[^.?!]*\b{}\b[^.?!]*[.?!(?:\s)]*[^.?!]*[.?!(?:\s)]'.format(phrase), document_text, re.IGNORECASE)
+    matches = re.finditer(r'[^.?!]*[.?!(?:\s)]*[^.?!]*\b({})\b[^.?!]*[.?!(?:\s)]*[^.?!]*[.?!(?:\s)]'.format(phrase), document_text, re.IGNORECASE)
     # this works great! except, if the word match is in the same sentence, it only returns one
     # match/comment box. And, seems like a lot of work/takes a long time in a large file like Hamlet
-    
-
+    print(matches.values())
+    # print(matches.end)
     return matches
 
 
