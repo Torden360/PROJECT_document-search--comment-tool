@@ -6,17 +6,16 @@
 <head>
     <title>{% block title %} {% endblock %}</title>
     <link rel="stylesheet" href="../static/searchy.css">
+    <link href="https://fonts.googleapis.com/css?family=Codystar|Damion|Knewave|La+Belle+Aurore|Long+Cang|Nanum+Pen+Script|Neucha|Nothing+You+Could+Do|Permanent+Marker|Poiret+One|Satisfy|Raleway&display=swap" rel="stylesheet">
 </head>
 
 <body>
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
     <ul class="flashes">
         {% for message in messages %}
         <div class="message_flash">{{ message }}</div>
         {% endfor %}
     </ul>
-    {% endif %}
 {% endwith %}
 {% block bodycontent %}
 
