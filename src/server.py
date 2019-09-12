@@ -31,6 +31,7 @@ def display_user_homepage():
 
     if user.is_doc_owner:
     # if the user stored in the session is the doc_owner, then redirect to doc_owner homepage
+    # need to also add if user is owner of the document requested
         return redirect('/owner_home')
 
     else:
