@@ -4,7 +4,7 @@
 
 {% block bodycontent %}
 <header>
-    <h1>Viewing Statistics For File: {{file.name}}</h1>
+    <center class="page-header">Viewing Statistics For File: {{file.name}}</center>
     <navbar class="over-background">
         <a href="/owner_home">Back to Documents</a>
     </navbar>
@@ -56,7 +56,7 @@
             matchDiv.innerText = match[0];
             insertedGroupDiv.append(matchDiv);
 
-            if (note !== null) {
+            if (note !== null && typeof note !== 'undefined') {
                 noteTextarea = document.createElement('textarea');
                 noteTextarea.setAttribute('class', 'note');
                 noteTextarea.setAttribute('data-note-id', note[1]);
@@ -79,10 +79,16 @@
     function getGroupDict(evt) {
         // maybe i can do if the event bubbles, get it's parent node, else get node?
         
+        const statGroups = document.querySelectorAll('.stat_groups');
+            statGroups.forEach((element) => {
+                element.innerHTML = "";
+        });
+
         const searchClicked = evt.target;
         let clickedSearch = null;
         let groupDiv = null;
-        console.log(searchClicked.closest());
+        // will change to .closest when I have time
+        // console.log(searchClicked.closest('div'));
 
         if (searchClicked.children.length === 3) {
             let did = searchClicked.getAttribute('data-doc');
@@ -118,6 +124,7 @@
                 //         toRemove[0].remove('div');
                 //     }
                 // }
+
                 let insertedGroupDiv = createDiv(tuple);
                 groupDiv.appendChild(insertedGroupDiv);
             });
