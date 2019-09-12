@@ -132,7 +132,10 @@ for (let i = 0; i < closeMatch.length; i++) {
             })
         })
         .then(response => response.json())
-        .then(response => console.log('Success:', JSON.stringify(response)))
+        .then(response => {
+            console.log('Success:', JSON.stringify(response));
+            // select flash message div and set the innerHTML to what I want
+        })
         .catch(error => console.error('Error:', error));
     }
 
