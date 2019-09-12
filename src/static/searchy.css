@@ -223,6 +223,7 @@ a {
     background-color: #cabdda;
     margin: 10px;
     min-width: 18%;
+    border-radius: 5px;
 }
 
 .video {
@@ -244,7 +245,7 @@ a {
 }
 
 html {
-    /*font-family: 'Neucha', cursive;*/
+    font-family: 'Raleway', sans-serif;
     /* position: fixed;
     right: 0;
     bottom: 0; 
