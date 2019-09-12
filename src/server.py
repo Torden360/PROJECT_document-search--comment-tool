@@ -16,10 +16,12 @@ from search import search
 
 import random
 
+import os
+
 
 app = Flask(__name__)
 
-app.secret_key = "ABC"
+app.secret_key = os.environ.get('SECRET_KEY')
 
 
 @app.route('/')
