@@ -49,8 +49,8 @@ def get_context(phrase, document_text):
 
 def search(phrase, document_text):
 
-#     matches = re.findall(r'\b{}\b'.format(phrase), document_text)
-
+    # phrase = re.escape(phrase)
+    # This is escaping, but then the for loop doesn't work
     matches = re.finditer(r'[^.?!]*[.?!(?:\s)]*[^.?!]*\b({})\b[^.?!]*[.?!(?:\s)]*[^.?!]*[.?!(?:\s)]'.format(phrase), document_text, re.IGNORECASE)
     print('this be matches:', matches)
     matches_list = []
@@ -64,8 +64,9 @@ def search(phrase, document_text):
         match_dict['start'] = [match.start(1), match.start()]
         match_dict['end'] = [match.end(1), match.end()]
         matches_list.append(match_dict)
+        print('arrrrrrrrr')
 
-    print(matches_list)
+    print(matches_list, 'this is matches list')
     return matches_list
 
     # This is not working properly, is not matching on last word tomorrow:
