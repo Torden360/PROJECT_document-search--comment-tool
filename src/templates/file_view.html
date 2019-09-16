@@ -19,36 +19,36 @@
         </header>
         You are viewing the uploaded file: {{file.name}}
         {% endif %}
-    </div>
 
-    <div id="search">
-        <form id="search_bar" action="/search_view">
-            <input id="search_bar" type="text" name="search_phrase" placeholder="Search">
-            <input type="text" name="doc_id" value="{{file.document_id}}" hidden>
-            <input type="submit" hidden>
-        </form>
+        <div id="search">
+            <form id="search_bar" action="/search_view">
+                <input id="search_bar" type="text" name="search_phrase" placeholder="Search">
+                <input type="text" name="doc_id" value="{{file.document_id}}" hidden>
+                <input id="hiddenSearchBtn" type="submit" hidden>
+            </form>
+        </div>
     </div>
 
     <div class="container">
         <div class="contain-file">
             <p id="file">
-    {{text}}
+{{text}}
             </p>
         </div>
 
         <div class="match_container">
-            {% if matches %}
+            {% if matches_list %}
                 <button class="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
-                {% for match in matches %}
-                <div class="matches" data-start="1" data-end="3"> <span class="close_match">x</span> 
-                    <label class="match_result"> {{match}} </label>
+                {% for match in matches_list %}
+                <div class="matches" data-start="{{match['start']}}" data-end="{{match['end']}}"> <span class="close_match">x</span> 
+                    <label class="match_result"> {{match['match']}} </label>
                     <textarea class="notes" row="10" col="50">Note: </textarea>
                 </div>
                 {% endfor %}
                 <button id="save_matches_button" data-search-id="{{search_id}}" value="Save">Save</button>
             {% endif %}
             
-            {% if not matches %}
+            {% if not matches_list %}
             No match results found.
             {% endif %}
         </div>
@@ -56,6 +56,49 @@
     </div>
 </div>
 <script>
+// todo highlight
+(function highlightMatches() {
+    const matches = document.querySelectorAll('.matches');
+    let file = document.querySelector('#file');
+    let tempFile = String(file.innerHTML);
+    console.log('initial file', file);
+    console.log('initial tempFile', tempFile);
+    if (matches !== null) {
+        matchOffsets = [];
+        for (let i = 0; i < matches.length; i++) {
+            matchForHighlight = [];
+            matchForHighlight.push(matches[i].getAttribute('data-start'));
+            matchForHighlight.push(matches[i].getAttribute('data-end'));
+            matchOffsets.push(matchForHighlight);
+            console.log('this is ea maatch for highlight', matchForHighlight);
+        }
+        for (let i = (matchOffsets.length - 1); i > -1; i -= 1) {
+            console.log('matchoffsets', matchOffsets[i]);
+            [start, end] = matchOffsets[i];
+
+            start = JSON.parse(start);
+            let phraseS = start[0];
+            let contextS = start[1];
+
+            end = JSON.parse(end);
+            let phraseE = end[0];
+            let contextE = end[1];
+
+            let words = tempFile.slice(phraseS, phraseE + 1);
+            let formattedWords = `<span style="background-color: #cabdda">${words}</span>`;
+
+            // We need access to splice here, so we're converting the file into an array to
+            // do so. This will likely need some attention in the future.
+            tempFile = tempFile.split('');
+            tempFile.splice(phraseS, words.length, formattedWords);
+            tempFile = tempFile.join('');
+        };
+        console.log('file after for loop', file);
+        console.log('tempFile after fo loop', tempFile);
+        file.innerHTML = tempFile;
+    }
+})();
+
 
 const closeMatch  = document.querySelectorAll('.close_match');
 
@@ -66,10 +109,6 @@ for (let i = 0; i < closeMatch.length; i++) {
         this.parentElement.removeAttribute('class');
     });
 }
-
-// would have to be on the containing div, but if still saving even when view closes, can try:
-// Element.removeAttribute('class')
-// to remove the element from being grouped with the matches class query selector
 
     // Alert group notes were saved
 
@@ -92,8 +131,6 @@ for (let i = 0; i < closeMatch.length; i++) {
         matchData['matches'] = [];
 
         for (let i = 0; i < matches.length; i++) {
-            console.log("Attr names: ", matches[i].getAttributeNames(), "Attributes: ", 
-                        matches[i].getAttribute("data-start"));
 
             let notes = null;
 
@@ -131,10 +168,12 @@ for (let i = 0; i < closeMatch.length; i++) {
                 "content-type": "application/json"
             })
         })
-        .then(response => response.json())
         .then(response => {
-            console.log('Success:', JSON.stringify(response));
-            // select flash message div and set the innerHTML to what I want
+            flash = document.querySelector('#flash');
+            flash.innerText = "Your matches and notes have been saved."
+            window.setTimeout(() => {
+                flash.innerText = "";
+            }, 2000);
         })
         .catch(error => console.error('Error:', error));
     }
