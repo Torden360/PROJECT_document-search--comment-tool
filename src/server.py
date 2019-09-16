@@ -155,8 +155,12 @@ def display_doc_stats():
     doc_id = request.args.get('did')
     file = Document.query.get(doc_id)
 
+    print(file, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^ file')
+
     searches = file.searches
     # get all searches for selected file
+
+    print('sEARCHESSSSSS', searches)
 
     search_phrase_set = set()
     # create a set for search phrases
@@ -188,6 +192,8 @@ def display_doc_stats():
 
     search_tuples = Sort_Tuple(search_tuples)
     # call the sort function on the search tuples
+
+    print(search_tuples, 'STTTS')
     
     return render_template('stats_view.html', file=file, search_tuples=search_tuples)
 
@@ -351,8 +357,6 @@ def display_document():
         # TODO: I'm not using this, so I don't think I need it here
 
         file = Document.query.get(doc_id)
-
-        print(file, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^ file')
 
         text = bytes.decode(file.text)
         # decodes byte string
