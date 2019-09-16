@@ -328,6 +328,11 @@ def display_document():
         session['user_id'] = user.user_id
         # store the user the session
 
+        session['doc_id'] = file.document_id
+        # I believe I took this out because of a bug, but I have to put it back in for now otherwise
+        # can't use the back to document link. Will have to test more thoroughly to see if this is 
+        # actually a problem
+
         text = bytes.decode(file.text)
         # decodes byte string
 
@@ -340,10 +345,14 @@ def display_document():
 
         doc_id = session.get('did')
 
+        print('docccccccc idddddddddddd', doc_id)
+
         # user_id = session.get('user_id')
         # TODO: I'm not using this, so I don't think I need it here
 
         file = Document.query.get(doc_id)
+
+        print(file, '^^^^^^^^^^^^^^^^^^^^^^^^^^^^ file')
 
         text = bytes.decode(file.text)
         # decodes byte string
@@ -376,12 +385,12 @@ def search_document():
     file = Document.query.get(document_id)
     text = bytes.decode(file.text)
 
-    matches = search(search_phrase, text)
+    matches_list = search(search_phrase, text)
     # calls FN to regex over given phrase and decoded text
     # could decode within the search FN, looking into encrypting this document in the future
 
     return render_template("file_view.html", file=file, text=text, 
-        search_phrase=search_phrase, search_id=search_id, matches=matches)
+        search_phrase=search_phrase, search_id=search_id, matches_list=matches_list)
 
 
 @app.route('/save_grouped_matches', methods=['POST'])
