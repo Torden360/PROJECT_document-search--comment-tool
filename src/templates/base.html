@@ -11,7 +11,7 @@
 
 <body>
 {% with messages = get_flashed_messages() %}
-    <ul class="flashes">
+    <ul id="flash">
         {% for message in messages %}
         <div class="message_flash">{{ message }}</div>
         {% endfor %}
