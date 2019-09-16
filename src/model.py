@@ -68,8 +68,8 @@ class Search_Match(db.Model):
 
     match_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     search_id = db.Column(db.Integer, db.ForeignKey('searches.search_id'))
-    start_offset = db.Column(db.Integer, nullable=False)
-    end_offset = db.Column(db.Integer, nullable=False)
+    start_offset = db.Column(db.String(150), nullable=False)
+    end_offset = db.Column(db.String(150), nullable=False)
     match_content = db.Column(db.Text)
 
 # TODO: think I will need to add group member_id, group_id
@@ -144,7 +144,7 @@ def connect_to_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # should turn this off, otherwise buggy
 
-    app.config['SQLALCHEMY_ECHO'] = False
+    app.config['SQLALCHEMY_ECHO'] = True
     # don't need to have this on, unless want to see the SQL query that 
     # sqlalchemy is executing
 
