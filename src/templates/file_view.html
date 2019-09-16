@@ -59,11 +59,10 @@
 // todo highlight
 (function highlightMatches() {
     const matches = document.querySelectorAll('.matches');
-    let file = document.querySelector('#file');
-    let tempFile = String(file.innerHTML);
-    console.log('initial file', file);
-    console.log('initial tempFile', tempFile);
+
     if (matches !== null) {
+        let file = document.querySelector('#file');
+        let tempFile = String(file.innerHTML);
         matchOffsets = [];
         for (let i = 0; i < matches.length; i++) {
             matchForHighlight = [];
