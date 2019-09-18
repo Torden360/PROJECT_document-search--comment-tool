@@ -491,6 +491,8 @@ def authenticate_passcode():
 
     file = Document.query.get(doc_id)
 
+    print(file.passcode, 'this is file passcode')
+
     if file.passcode != passcode:
     # check if passcode given is the stored passcode for the requested document
 
@@ -510,7 +512,8 @@ def authenticate_passcode():
         # does not account for repeat name entries yet
 
     session["user_id"] = user.user_id
-    session["passcode"] = file.passcode
+    session["passcode"] = True
+    # with hashing, storing this in a session won't work file.passcode
     # store the session data
 
     flash(f'Welcome, {username}')
