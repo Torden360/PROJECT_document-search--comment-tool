@@ -1,8 +1,10 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+from sqlalchemy_utils import PasswordType, force_auto_coercion
 # TODO: don't think I need to import func here
 
 db = SQLAlchemy()
+force_auto_coercion()
 
 # ----------- Model Definitions ----------
 
@@ -15,7 +17,11 @@ class Document(db.Model):
     text = db.Column(db.LargeBinary, nullable=False)
     # db.LargeBinary stores the file in a bytea column, sqlalchemy takes care of conversion
     name = db.Column(db.String(60))
-    passcode = db.Column(db.String(60), nullable=False)
+    passcode = db.Column(PasswordType(
+        schemes=[
+            'pbkdf2_sha512'
+        ]
+    ))
     # TODO: make passcode a passwordType
     doc_owner = db.Column(db.String(60), nullable=False)
     # I would want to do this instead for more security, but don't have time to build out the other functionalities it requires
